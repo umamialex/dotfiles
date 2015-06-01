@@ -1,0 +1,10 @@
+[user]
+	name = Alexander Martin
+	email = alex@suitupalex.com
+
+[alias]
+  plog = log --graph --all --oneline --decorate
+[core]
+	excludesfile = /home/alex/.gitignore_global
+[color]
+	ui = true
