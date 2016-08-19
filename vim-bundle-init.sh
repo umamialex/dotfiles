@@ -7,6 +7,7 @@ mkdir -p ~/.vim/autoload ~/.vim/bundle && \
   git clone https://github.com/digitaltoad/vim-pug && \
   git clone https://github.com/elzr/vim-json && \
   git clone https://github.com/evanmiller/nginx-vim-syntax && \
+  git clone https://github.com/gcorne/vim-sass-lint && \
   git clone https://github.com/hail2u/vim-css3-syntax && \
   git clone https://github.com/mxw/vim-jsx && \
   git clone https://github.com/plasticboy/vim-markdown && \
