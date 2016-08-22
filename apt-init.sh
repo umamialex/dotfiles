@@ -2,14 +2,22 @@
 
 apt-get update \
   -y \
-  -qq \
+  -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
 && \
 
 apt-get install \
   -y \
-  -qq \
+  -q \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold" \
+  aptitude \
+&& \
+
+aptitude install \
+  -y \
+  -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
   apt-transport-https \
@@ -30,13 +38,13 @@ echo 'deb https://apt.dockerproject.org/repo ubuntu-xenial main' \
   >> /etc/apt/sources.list.d/docker.list \
 && \
 
-apt-get update \
+aptitude update \
   -y \
-  -qq \
+  -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
 && \
-apt-get purge lxc-docker && \
+aptitude purge lxc-docker && \
 apt-cache policy docker-engine && \
 
 # Fish Prerequisites
@@ -48,25 +56,31 @@ apt-add-repository \
 # NodeJS Prerequisites
 curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
 
-apt-get update \
+aptitude update \
   -y \
-  -qq \
+  -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
 && \
 
-apt-get upgrade \
+aptitude full-upgrade \
   -y \
-  -qq \
+  -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
 && \
 
-apt-get install \
+aptitude install \
   -y \
-  -qq \
+  -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
+  -f \
+  init-system-helpers \
+  lsb-base \
+  libdevmapper1.02.1 \
+  libltd17 \
+  libsystemd0 \
   build-essential \
   docker-engine \
   fish \
