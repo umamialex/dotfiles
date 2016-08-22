@@ -1,0 +1,9 @@
+sudo: required
+dist: trusty
+language: generic
+before_install:
+  - sudo service docker stop
+install:
+  - sudo ./apt-init.sh
+script:
+  - ./tests/apt-init.sh
