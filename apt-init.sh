@@ -25,6 +25,7 @@ aptitude install \
   software-properties-common \
   linux-image-extra-$(uname -r) \
   linux-image-extra-virtual \
+  curl \
 && \
 
 # Docker Prerequisites
