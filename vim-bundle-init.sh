@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Initializing vim bundles..."
 
 mkdir -p ~/.vim/autoload ~/.vim/bundle && \
