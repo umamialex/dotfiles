@@ -111,6 +111,7 @@ aptitude install \
   git \
   nodejs \
   silversearcher-ag \
+  tmux \
   vim \
 && \
 
