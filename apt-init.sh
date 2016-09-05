@@ -3,7 +3,7 @@
 log() {
   echo && \
   echo "##################################################" && \
-  echo "# $1" && \
+  echo "# $USER: $1" && \
   echo "##################################################" && \
   echo
 }
@@ -166,6 +166,6 @@ log "Fixing permission for npm:" && \
 chown -R $USER:$USER $(npm config get prefix)/{lib/node_modules,bin,share} && \
 
 log "Fixing permissions for ~:" && \
-chown -R $USER:$USER ~ && \
+chown -R $USER:$USER /home/$USER && \
 
 log "Done!"

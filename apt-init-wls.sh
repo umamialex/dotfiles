@@ -3,7 +3,7 @@
 log() {
   echo && \
   echo "##################################################" && \
-  echo "# $1" && \
+  echo "# $USER: $1" && \
   echo "##################################################" && \
   echo
 }
@@ -116,14 +116,27 @@ sudo -u $USER \
 log "Installing fish plugins:" && \
 sudo -u $USER fish -c "fisher edc/bass" && \
 sudo -u $USER fish -c "fisher spin" && \
-sudo -u $USER fish -c "fisher simnalamburt/shellder" && \
 
 # Global NPM Install
+log "Enabling sudoless global npm install:" && \
+sudo -u $USER mkdir ~/.npm-global && \
+sudo -u $USER npm config set prefix '~/.npm-global' && \
+sudo -u $USER export PATH=~/.npm-global/bin:$PATH
+
 log "Running npm global init:" && \
-./npm-global-init.sh && \
+sudo -u $USER NPM_CONFIG_PREFIX=~/.npm-global ./npm-global-init.sh && \
 
 # Fix Permissions
 log "Fixing permissions:" && \
 chown -R $USER:$USER /home/$USER && \
+
+# Set fish as default shell
+log "Setting fish as default shell:" && \
+echo "" >> /home/$USER/.bashrc && \
+echo "fish; exit" >> /home/$USER/.bashrc && \
+
+# Update default editor
+log "Updating default editor:" && \
+update-alternatives --config editor && \
 
 log "Done!"
