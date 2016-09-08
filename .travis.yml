@@ -1,9 +1,7 @@
 sudo: required
 dist: trusty
 language: generic
-before_install:
-  - sudo service docker stop
 install:
-  - sudo ./apt-init.sh
+  - sudo USER=$USER ./apt-init-test.sh
 script:
   - ./tests/apt-init.sh

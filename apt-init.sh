@@ -1,100 +1,72 @@
 #!/bin/bash
 
-apt-get update \
-  -y \
-  -qq \
-  -o Dpkg::Options::="--force-confdef" \
-  -o Dpkg::Options::="--force-confold" \
-&& \
+. ./apt-init/log.sh && \
 
-apt-get install \
-  -y \
-  -qq \
-  -o Dpkg::Options::="--force-confdef" \
-  -o Dpkg::Options::="--force-confold" \
-  apt-transport-https \
-  ca-certificates \
-  software-properties-common \
-  linux-image-extra-$(uname -r) \
-  linux-image-extra-virtual \
-&& \
+./apt-init/update.sh && \
+
+./apt-init/installers/aptitude.sh && \
+./apt-init/installers/core.sh && \
 
 # Docker Prerequisites
 
+log "Creating apt-key for docker:" && \
 apt-key adv \
   --keyserver hkp://p80.pool.sks-keyservers.net:80 \
   --recv-keys 58118E89F3A912897C070ADBF76221572C52609D \
 && \
 
+log "Adding Docker repo:" && \
 echo 'deb https://apt.dockerproject.org/repo ubuntu-xenial main' \
   >> /etc/apt/sources.list.d/docker.list \
 && \
 
-apt-get update \
-  -y \
-  -qq \
-  -o Dpkg::Options::="--force-confdef" \
-  -o Dpkg::Options::="--force-confold" \
-&& \
-apt-get purge lxc-docker && \
+./apt-init/update.sh && \
+
+log "Purging docker packages:" && \
+aptitude purge lxc-docker && \
+
+log "Clearing docker cache:" && \
 apt-cache policy docker-engine && \
 
-# Fish Prerequisites
-apt-add-repository \
-  -y \
-  ppa:fish-shell/release-2 \
-&& \
+./apt-init/prerequisites/fish.sh && \
+./apt-init/prerequisites/node.sh && \
 
-# NodeJS Prerequisites
-curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+./apt-init/update.sh && \
+./apt-init/upgrade.sh && \
 
-apt-get update \
+./apt-init/installers/dev.sh && \
+log "Installing docker-engine:" && \
+aptitude install \
   -y \
-  -qq \
+  -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
-&& \
-
-apt-get upgrade \
-  -y \
-  -qq \
-  -o Dpkg::Options::="--force-confdef" \
-  -o Dpkg::Options::="--force-confold" \
-&& \
-
-apt-get install \
-  -y \
-  -qq \
-  -o Dpkg::Options::="--force-confdef" \
-  -o Dpkg::Options::="--force-confold" \
-  build-essential \
+  -f \
   docker-engine \
-  fish \
-  git \
-  nodejs \
-  silversearcher-ag \
-  vim \
 && \
 
 # Docker Configuration
+log "Creating docker user group:" && \
 groupadd --force docker && \
+
+log "Adding current user to docker group:" && \
 usermod -aG docker $USER && \
+
+log "Starting docker service:" && \
 service docker start && \
 
-# User Configuration
-cp .gitconfig ~/.gitconfig && \
-cp .gitignore_global ~/.gitignore_global && \
+./apt-init/installers/config.sh && \
+./apt-init/installers/npm.sh && \
 
-cp .vimrc ~/.vimrc && \
+./apt-init/fix-permissions.sh && \
 
-cp .eslintrc ~/.eslintrc && \
+# Set fish as default shell
+log "Setting fish as default shell:" && \
+usermod -s `which fish` $USER && \
+usermod -s `which fish` root && \
 
-mkdir -p ~/.config/fish && \
-cp config.fish ~/.config/fish/config.fish && \
+./apt-init/update-sudoers.sh && \
 
-./vim-bundle-init.sh && \
-./npm-global-init.sh && \
+./apt-init/update-defaults.sh && \
 
-# Fix Permissions
-chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share} && \
-chown -R $(whoami) ~
+log "Done!"
