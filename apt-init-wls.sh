@@ -24,6 +24,7 @@ log "Setting fish as default shell:" && \
 echo "" >> /home/$USER/.bashrc && \
 echo "fish; exit" >> /home/$USER/.bashrc && \
 
+./apt-init/update-sudoers.sh && \
 ./apt-init/update-defaults.sh && \
 
 log "Done!"

@@ -65,6 +65,8 @@ log "Setting fish as default shell:" && \
 usermod -s `which fish` $USER && \
 usermod -s `which fish` root && \
 
+./apt-init/update-sudoers.sh && \
+
 ./apt-init/update-defaults.sh && \
 
 log "Done!"
