@@ -1,7 +1,5 @@
 #!/bin/bash
 
-docker run hello-world && \
- 
 node -v && \
 npm -v && \
 
