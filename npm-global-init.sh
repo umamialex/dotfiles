@@ -9,6 +9,7 @@ npm install -g \
   eslint-plugin-react \
   sass-lint \
   sass-lint-config-ctrl \
+  pm2 \
   pug-lint \
   pug-lint-config-ctrl \
   n
