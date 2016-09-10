@@ -17,6 +17,7 @@ aptitude install \
   build-essential \
   fish \
   git \
+  htop \
   nodejs \
   silversearcher-ag \
   tmux \
