@@ -12,6 +12,7 @@ npm install -g \
   pm2 \
   pug-lint \
   pug-lint-config-ctrl \
-  n
+  n \
+  yarn
 
 echo "Done"
