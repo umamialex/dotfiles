@@ -17,6 +17,7 @@
 ./apt-init/installers/config.sh && \
 ./apt-init/installers/npm.sh && \
 ./apt-init/installers/mongodb.sh && \
+./apt-init/installers/gcloud.sh && \
 
 ./apt-init/fix-permissions.sh && \
 
