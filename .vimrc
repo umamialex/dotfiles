@@ -12,6 +12,7 @@ set viminfo='100,<500,s10,h
 set backspace=2
 set colorcolumn=80
 set hlsearch
+set ruler
 highlight ColorColumn ctermbg=blue ctermfg=white
 
 set statusline+=%#warningmsg#
