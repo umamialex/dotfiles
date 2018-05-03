@@ -1,11 +1,24 @@
-execute pathogen#infect()
+set nocompatible
+filetype off
 
 syntax on
+
+set rtp+=~/.vim/bundle/Vundle.vim
+
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'tpope/vim-fugitive'
+Plugin 'pangloss/vim-javascript'
+Plugin 'othree/javascript-libraries-syntax.vim'
+Plugin 'elzr/vim-json'
+Plugin 'w0rp/ale'
+call vundle#end()
+
 filetype plugin indent on
 
 set smartindent
-set tabstop=2
-set shiftwidth=2
+set tabstop=4
+set shiftwidth=4
 set expandtab
 set relativenumber
 set viminfo='100,<500,s10,h
@@ -36,6 +49,8 @@ let g:syntastic_sass_checkers = ['sass_lint']
 let g:syntastic_scss_checkers = ['sass_lint']
 
 let g:syntastic_javascript_checkers = ["eslint"]
+
+au FileType java setl sw=4 sts=4 et
 
 if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
