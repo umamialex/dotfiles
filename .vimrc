@@ -17,8 +17,8 @@ call vundle#end()
 filetype plugin indent on
 
 set smartindent
-set tabstop=4
-set shiftwidth=4
+set tabstop=2
+set shiftwidth=2
 set expandtab
 set relativenumber
 set viminfo='100,<500,s10,h
