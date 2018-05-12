@@ -30,6 +30,7 @@ apt-cache policy docker-engine && \
 
 ./apt-init/prerequisites/fish.sh && \
 ./apt-init/prerequisites/node.sh && \
+./apt-init/prerequisites/vim.sh && \
 
 ./apt-init/update.sh && \
 ./apt-init/upgrade.sh && \
