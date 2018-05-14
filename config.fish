@@ -10,3 +10,5 @@ alias 10="dev; and cd tenfold"
 setenv SSH_ENV $HOME/.ssh/environment
 setenv DOCKER_HOST localhost:2375
 set PATH ~/.npm-global/bin $PATH
+
+thefuck --alias | source
