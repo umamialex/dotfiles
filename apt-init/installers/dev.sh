@@ -21,4 +21,6 @@ aptitude install \
   nodejs \
   silversearcher-ag \
   tmux \
-  vim
+  vim \
+  python3-dev \
+  python3-pip
