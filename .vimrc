@@ -8,7 +8,9 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
-Plugin 'pangloss/vim-javascript'
+Plugin 'othree/yajs.vim'
+Plugin 'fenetikm/falcon'
+Plugin 'chemzqm/vim-jsx-improve'
 Plugin 'othree/javascript-libraries-syntax.vim'
 Plugin 'elzr/vim-json'
 Plugin 'w0rp/ale'
@@ -27,6 +29,8 @@ set colorcolumn=80
 set hlsearch
 set ruler
 highlight ColorColumn ctermbg=blue ctermfg=white
+colorscheme falcon
+set termguicolors
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
