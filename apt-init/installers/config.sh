@@ -28,5 +28,4 @@ sudo -u $USER \
   curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs git.io/fisher && \
 
 log "Installing fish plugins:" && \
-sudo -u $USER fish -c "fisher edc/bass" && \
-sudo -u $USER fish -c "fisher spin"
+sudo -u $USER fish -c "fisher add edc/bass"
