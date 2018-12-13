@@ -3,22 +3,22 @@
 . ./apt-init/log.sh && \
 
 log "Installing git config:" && \
-sudo -u $USER ln -rs .gitconfig ~/.gitconfig && \
+sudo -u $USER ln -rsfn .gitconfig ~/.gitconfig && \
 
 log "Installing global gitignore:" && \
-sudo -u $USER ln -rs .gitignore_global ~/.gitignore_global && \
+sudo -u $USER ln -rsfn .gitignore_global ~/.gitignore_global && \
 
 log "Installing .vimrc:" && \
-sudo -u $USER ln -rs .vimrc ~/.vimrc && \
+sudo -u $USER ln -rsfn .vimrc ~/.vimrc && \
 
 log "Installing .eslintrc:" && \
-sudo -u $USER ln -rs .eslintrc ~/.eslintrc && \
+sudo -u $USER ln -rsfn .eslintrc ~/.eslintrc && \
 
 log "Installing fish config directory:" && \
 sudo -u $USER mkdir -p ~/.config/fish && \
 
 log "Installing fish config:" && \
-sudo -u $USER ln -rs config.fish ~/.config/fish/config.fish && \
+sudo -u $USER ln -rsfn config.fish ~/.config/fish/config.fish && \
 
 log "Installing vim bundles:" && \
 sudo -u $USER ./vim-bundle-init.sh && \
