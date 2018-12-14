@@ -7,6 +7,7 @@ npm install -g \
   eslint-config-ctrl \
   eslint-config-ctrl-react \
   eslint-plugin-react \
+  ngrok \
   sass-lint \
   sass-lint-config-ctrl \
   pm2 \
