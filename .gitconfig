@@ -6,5 +6,7 @@
   plog = log --graph --all --oneline --decorate
 [core]
 	excludesfile = ~/.gitignore_global
+	filemode = false
+	filemode = false
 [color]
 	ui = true
