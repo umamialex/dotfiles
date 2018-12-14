@@ -12,7 +12,7 @@ aptitude install \
   init-system-helpers \
   lsb-base \
   libdevmapper1.02.1 \
-  libltd17 \
+  libltdl7 \
   libsystemd0 \
   build-essential \
   fish \
