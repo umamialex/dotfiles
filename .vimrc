@@ -8,12 +8,15 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
-Plugin 'othree/yajs.vim'
 Plugin 'fenetikm/falcon'
 Plugin 'chemzqm/vim-jsx-improve'
-Plugin 'othree/javascript-libraries-syntax.vim'
+Plugin 'HerringtonDarkholme/yats.vim'
 Plugin 'elzr/vim-json'
 Plugin 'w0rp/ale'
+Plugin 'tmux-plugins/vim-tmux'
+Plugin 'flazz/vim-colorschemes'
+Plugin 'felixhummel/setcolors.vim'
+Plugin 'mhartington/oceanic-next'
 call vundle#end()
 
 filetype plugin indent on
@@ -28,9 +31,9 @@ set backspace=2
 set colorcolumn=80
 set hlsearch
 set ruler
-highlight ColorColumn ctermbg=blue ctermfg=white
-colorscheme falcon
-set termguicolors
+colorscheme OceanicNext
+highlight ColorColumn ctermbg=237 ctermfg=white
+highlight Normal ctermfg=253 ctermbg=black
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
