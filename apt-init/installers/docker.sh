@@ -10,7 +10,7 @@ apt-get update \
   -o Dpkg::Options::="--force-confold" \
 && \
 
-log "Install prequesites:" && \
+log "Install prerequisites:" && \
 apt-get install \
   -y \
   -q \
@@ -44,7 +44,7 @@ apt-get update \
 && \
 
 
-log "Install prequesites:" && \
+log "Installing docker:" && \
 apt-get install \
   -y \
   -q \
