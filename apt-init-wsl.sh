@@ -10,31 +10,16 @@
 ./apt-init/prerequisites/fish.sh && \
 ./apt-init/prerequisites/node.sh && \
 ./apt-init/prerequisites/vim.sh && \
-
-aptitude hold \
-  postgresql-common \
-  postgresql-9.3 \
-  postgresql-9.4 \
-  postgresql-9.5 \
-  postgresql-9.6 \
-  postgresql-client-9.3 \
-  postgresql-client-9.4 \
-  postgresql-client-9.5 \
-  postgresql-client-9.6 \
-  postgresql-contrib-9.3 \
-  postgresql-contrib-9.4 \
-  postgresql-contrib-9.5 \
-  postgresql-contrib-9.6 \
-&& \
+./apt-init/prerequisites/yarn.sh && \
 
 ./apt-init/update.sh && \
 ./apt-init/upgrade.sh && \
 
 ./apt-init/installers/dev.sh && \
 ./apt-init/installers/config.sh && \
-./apt-init/installers/npm.sh && \
-./apt-init/installers/gcloud.sh && \
+./apt-init/installers/mongodb.sh && \
 ./apt-init/installers/docker.sh && \
+./apt-init/installers/yarn-global.sh && \
 
 ./apt-init/fix-permissions.sh && \
 
@@ -44,5 +29,9 @@ echo "" >> /home/$USER/.bashrc && \
 echo "fish; exit" >> /home/$USER/.bashrc && \
 
 ./apt-init/update-sudoers.sh && \
+
+if [[ "$CI" != "true" ]]; then
+  ./apt-init/update-defaults.sh
+fi && \
 
 log "Done!"

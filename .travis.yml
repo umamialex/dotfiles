@@ -1,7 +1,7 @@
 sudo: required
-dist: trusty
+dist: bionic
 language: generic
 install:
-  - sudo USER=$USER ./apt-init-test.sh
+  - sudo USER=$USER ./apt-init-wsl.sh
 script:
   - ./tests/apt-init.sh

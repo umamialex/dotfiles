@@ -12,15 +12,17 @@ aptitude install \
   init-system-helpers \
   lsb-base \
   libdevmapper1.02.1 \
-  libltd17 \
+  libltdl7 \
   libsystemd0 \
   build-essential \
   fish \
   git \
   htop \
   nodejs \
+  yarn \
   silversearcher-ag \
   tmux \
   vim \
   python3-dev \
-  python3-pip
+  python3-pip \
+  redis-server

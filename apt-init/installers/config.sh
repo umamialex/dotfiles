@@ -19,13 +19,21 @@ sudo -u $USER mkdir -p ~/.config/fish && \
 
 log "Installing fish config:" && \
 sudo -u $USER ln -rsfn config.fish ~/.config/fish/config.fish && \
+sudo -u $USER ln -rsfn config.fish ~/.config/fish/env.fish && \
 
 log "Installing vim bundles:" && \
-sudo -u $USER ./vim-bundle-init.sh && \
+sudo -u $USER ./apt-init/installers/pathogen.sh && \
 
 log "Installing Fisherman:" && \
 sudo -u $USER \
   curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs git.io/fisher && \
 
 log "Installing fish plugins:" && \
-sudo -u $USER fish -c "fisher add edc/bass"
+sudo -u $USER fish -c "fisher add edc/bass" && \
+
+log "Installing tmux plugin manager:" && \
+rm -rf ~/.tmux/plugins/tmp && \
+sudo -u $USER git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && \
+
+log "Installing .tmux.conf:" && \
+sudo -u $USER ln -rsfn .tmux.conf ~/.tmux.conf
