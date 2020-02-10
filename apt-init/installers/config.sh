@@ -19,6 +19,7 @@ sudo -u $USER mkdir -p ~/.config/fish && \
 
 log "Installing fish config:" && \
 sudo -u $USER ln -rsfn config.fish ~/.config/fish/config.fish && \
+sudo -u $USER ln -rsfn config.fish ~/.config/fish/env.fish && \
 
 log "Installing vim bundles:" && \
 sudo -u $USER ./vim-bundle-init.sh && \

@@ -19,6 +19,7 @@ aptitude install \
   git \
   htop \
   nodejs \
+  yarn \
   silversearcher-ag \
   tmux \
   vim \

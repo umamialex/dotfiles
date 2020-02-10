@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "Installing global npm modules..."
+echo "Installing global yarn modules..."
 
-npm install -g \
+yarn global add \
   eslint \
   eslint-config-ctrl \
   eslint-config-ctrl-react \

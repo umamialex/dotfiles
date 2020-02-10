@@ -10,7 +10,7 @@ setenv JAVA_HOME /mnt/c/Users/alex/Development/tenfold/jdk8
 setenv ANDROID_HOME /home/suitupalex/Android
 setenv SSH_ENV $HOME/.ssh/environment
 setenv DOCKER_HOST localhost:2375
-set PATH ~/.npm-global/bin $JAVA_HOME/bin $PATH
+set PATH (yarn global bin) ~/.npm-global/bin $JAVA_HOME/bin $PATH
 
 setenv NODE_ENV development
 setenv DEBUG "agg:*"
