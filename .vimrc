@@ -1,7 +1,7 @@
 set nocompatible
 filetype off
 
-syntax on
+syntax enable
 
 set rtp+=~/.vim/bundle/Vundle.vim
 
@@ -17,6 +17,7 @@ Plugin 'tmux-plugins/vim-tmux'
 Plugin 'flazz/vim-colorschemes'
 Plugin 'felixhummel/setcolors.vim'
 Plugin 'mhartington/oceanic-next'
+Plugin 'ruanyl/coverage.vim'
 call vundle#end()
 
 filetype plugin indent on
@@ -31,9 +32,10 @@ set backspace=2
 set colorcolumn=80
 set hlsearch
 set ruler
-colorscheme OceanicNext
-highlight ColorColumn ctermbg=237 ctermfg=white
+highlight ColorColumn ctermbg=blue ctermfg=white
 highlight Normal ctermfg=253 ctermbg=black
+highlight Visual cterm=reverse ctermbg=NONE
+highlight ALEError ctermbg=52
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -56,6 +58,7 @@ let g:syntastic_sass_checkers = ['sass_lint']
 let g:syntastic_scss_checkers = ['sass_lint']
 
 let g:syntastic_javascript_checkers = ["eslint"]
+let g:ale_linter_aliases = {'jsx': 'javascript'}
 
 au FileType java setl sw=4 sts=4 et
 
