@@ -28,6 +28,9 @@ echo "" >> /home/$USER/.bashrc && \
 echo "fish; exit" >> /home/$USER/.bashrc && \
 
 ./apt-init/update-sudoers.sh && \
-./apt-init/update-defaults.sh && \
+
+if [[ "$CI" != "true" ]]; then
+  ./apt-init/update-defaults.sh
+fi && \
 
 log "Done!"
