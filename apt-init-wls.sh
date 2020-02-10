@@ -18,7 +18,6 @@
 ./apt-init/installers/config.sh && \
 ./apt-init/installers/yarn.sh && \
 ./apt-init/installers/mongodb.sh && \
-./apt-init/installers/gcloud.sh && \
 ./apt-init/installers/docker.sh && \
 
 ./apt-init/fix-permissions.sh && \
