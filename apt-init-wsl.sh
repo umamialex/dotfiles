@@ -10,13 +10,13 @@
 ./apt-init/prerequisites/fish.sh && \
 ./apt-init/prerequisites/node.sh && \
 ./apt-init/prerequisites/vim.sh && \
+./apt-init/prerequisites/yarn.sh && \
 
 ./apt-init/update.sh && \
 ./apt-init/upgrade.sh && \
 
 ./apt-init/installers/dev.sh && \
 ./apt-init/installers/config.sh && \
-./apt-init/installers/yarn.sh && \
 ./apt-init/installers/mongodb.sh && \
 ./apt-init/installers/docker.sh && \
 

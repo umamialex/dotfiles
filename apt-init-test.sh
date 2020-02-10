@@ -10,6 +10,7 @@
 ./apt-init/prerequisites/fish.sh && \
 ./apt-init/prerequisites/node.sh && \
 ./apt-init/prerequisites/vim.sh && \
+./apt-init/prerequisites/yarn.sh && \
 
 aptitude hold \
   postgresql-common \
@@ -32,7 +33,6 @@ aptitude hold \
 
 ./apt-init/installers/dev.sh && \
 ./apt-init/installers/config.sh && \
-./apt-init/installers/yarn.sh && \
 ./apt-init/installers/gcloud.sh && \
 ./apt-init/installers/docker.sh && \
 

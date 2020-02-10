@@ -31,6 +31,7 @@ apt-cache policy docker-engine && \
 ./apt-init/prerequisites/fish.sh && \
 ./apt-init/prerequisites/node.sh && \
 ./apt-init/prerequisites/vim.sh && \
+./apt-init/prerequisites/yarn.sh && \
 
 ./apt-init/update.sh && \
 ./apt-init/upgrade.sh && \
@@ -57,7 +58,6 @@ log "Starting docker service:" && \
 service docker start && \
 
 ./apt-init/installers/config.sh && \
-./apt-init/installers/yarn.sh && \
 ./apt-init/installers/mongodb.sh && \
 
 ./apt-init/fix-permissions.sh && \
