@@ -18,12 +18,14 @@ Plugin 'flazz/vim-colorschemes'
 Plugin 'felixhummel/setcolors.vim'
 Plugin 'mhartington/oceanic-next'
 Plugin 'ruanyl/coverage.vim'
+Plugin 'nvie/vim-flake8'
 call vundle#end()
 
 filetype plugin indent on
 
 set smartindent
 set tabstop=2
+set softtabstop=2
 set shiftwidth=2
 set expandtab
 set relativenumber
@@ -50,15 +52,8 @@ let g:js_context_colors_highlight_function_names = 1
 let g:js_context_colors_block_scope = 1
 let g:js_context_colors_jsx = 1
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 1
-let g:syntastic_sass_checkers = ['sass_lint']
-let g:syntastic_scss_checkers = ['sass_lint']
-
-let g:syntastic_javascript_checkers = ["eslint"]
 let g:ale_linter_aliases = {'jsx': 'javascript'}
+let b:ale_linters = ['flake8', 'eslint']
 
 au FileType java setl sw=4 sts=4 et
 
