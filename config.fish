@@ -24,3 +24,5 @@ setenv AGG_JWT_AUDIENCE http://localhost:8080
 setenv AGG_SUCCESS_REDIRECT http://localhost:8080/profile/settings
 setenv AGG_DB_URL mongodb://localhost:27017
 setenv AGG_CONTENTFUL_FETCH_INTERVAL 900
+
+setenv CAREHUB_ENV development
