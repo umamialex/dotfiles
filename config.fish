@@ -14,7 +14,6 @@ setenv SSH_ENV $HOME/.ssh/environment
 setenv DOCKER_HOST localhost:2375
 set PATH (yarn global bin) $JAVA_HOME/bin ~/.local/bin $PATH
 
-setenv NODE_ENV development
 setenv DEBUG "agg:*"
 setenv API_VERSION v0
 setenv COOKIE_DOMAIN localhost
@@ -25,4 +24,4 @@ setenv AGG_SUCCESS_REDIRECT http://localhost:8080/profile/settings
 setenv AGG_DB_URL mongodb://localhost:27017
 setenv AGG_CONTENTFUL_FETCH_INTERVAL 900
 
-setenv CAREHUB_ENV development
+. ~/.config/fish/env.fish
