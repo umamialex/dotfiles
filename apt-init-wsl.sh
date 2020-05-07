@@ -22,6 +22,7 @@
 ./apt-init/installers/yarn-global.sh && \
 
 ./apt-init/fix-permissions.sh && \
+./apt-init/setup-services.sh && \
 
 # Set fish as default shell
 log "Setting fish as default shell:" && \

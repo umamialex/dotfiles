@@ -1,5 +1,5 @@
 [user]
-	name = Alexander Martin
+	name = Alex Martin
 	email = alex@suitupalex.com
 
 [alias]
@@ -7,5 +7,7 @@
 [core]
 	excludesfile = ~/.gitignore_global
 	filemode = false
+	eol = lf
+	autocrlf = input
 [color]
 	ui = true
