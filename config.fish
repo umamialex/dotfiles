@@ -11,7 +11,7 @@ alias tapp="tmux a -t agg-app"
 setenv JAVA_HOME /mnt/c/Users/alex/Development/tenfold/jdk8
 setenv ANDROID_HOME /home/suitupalex/Android
 setenv SSH_ENV $HOME/.ssh/environment
-setenv DOCKER_HOST localhost:2375
+setenv DOCKER_HOST unix:///var/run/docker.sock
 set PATH (yarn global bin) $JAVA_HOME/bin ~/.local/bin $PATH
 
 setenv DEBUG "agg:*"
