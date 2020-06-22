@@ -13,7 +13,10 @@
 ./apt-init/prerequisites/yarn.sh && \
 
 ./apt-init/update.sh && \
-./apt-init/upgrade.sh && \
+
+if [[ "$CI" != "true" ]]; then
+  ./apt-init/upgrade.sh
+fi && \
 
 ./apt-init/installers/dev.sh && \
 ./apt-init/installers/config.sh && \
