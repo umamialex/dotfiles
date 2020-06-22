@@ -5,4 +5,4 @@
 log "Adding fish repo:" && \
 apt-add-repository \
   -y \
-  ppa:fish-shell/release-2
+  ppa:fish-shell/release-3
