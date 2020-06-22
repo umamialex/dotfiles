@@ -1,5 +1,5 @@
 sudo: required
-dist: bionic
+dist: focal
 language: generic
 install:
   - sudo USER=$USER ./apt-init-wsl.sh
