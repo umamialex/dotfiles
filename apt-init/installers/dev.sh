@@ -18,6 +18,7 @@ aptitude install \
   fish \
   git \
   htop \
+  openjdk-8-jdk \
   nodejs \
   yarn \
   silversearcher-ag \

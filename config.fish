@@ -8,7 +8,7 @@ alias grafana="dev; and cd grafana"
 alias tapi="tmux a -t agg-ms-api"
 alias tapp="tmux a -t agg-app"
 
-setenv JAVA_HOME /mnt/c/Users/alex/Development/tenfold/jdk8
+setenv JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 setenv ANDROID_HOME /home/suitupalex/Android
 setenv SSH_ENV $HOME/.ssh/environment
 setenv DOCKER_HOST unix:///var/run/docker.sock
