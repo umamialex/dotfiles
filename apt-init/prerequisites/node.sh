@@ -2,5 +2,5 @@
 
 . ./apt-init/log.sh && \
 
-log "Downloading Node v10.x:" && \
-curl -sL https://deb.nodesource.com/setup_13.x | bash -
+log "Downloading Node v14.x:" && \
+curl -sL https://deb.nodesource.com/setup_14.x | bash -
