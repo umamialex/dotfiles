@@ -1,5 +1,7 @@
 #!/bin/bash
 
+go version && \
+
 node -v && \
 npm -v && \
 yarn -v &&\
