@@ -3,37 +3,37 @@
 . ./apt-init/log.sh && \
 
 log "Installing git config:" && \
-sudo -u $USER ln -rsfn .gitconfig ~/.gitconfig && \
+sudo --preserve-env=HOME -u $USER ln -rsfn .gitconfig ~/.gitconfig && \
 
 log "Installing global gitignore:" && \
-sudo -u $USER ln -rsfn .gitignore_global ~/.gitignore_global && \
+sudo --preserve-env=HOME -u $USER ln -rsfn .gitignore_global ~/.gitignore_global && \
 
 log "Installing .vimrc:" && \
-sudo -u $USER ln -rsfn .vimrc ~/.vimrc && \
+sudo --preserve-env=HOME -u $USER ln -rsfn .vimrc ~/.vimrc && \
 
 log "Installing .eslintrc:" && \
-sudo -u $USER ln -rsfn .eslintrc ~/.eslintrc && \
+sudo --preserve-env=HOME -u $USER ln -rsfn .eslintrc ~/.eslintrc && \
 
 log "Installing fish config directory:" && \
-sudo -u $USER mkdir -p ~/.config/fish && \
+sudo --preserve-env=HOME -u $USER mkdir -p ~/.config/fish && \
 
 log "Installing fish config:" && \
-sudo -u $USER ln -rsfn config.fish ~/.config/fish/config.fish && \
-sudo -u $USER ln -rsfn config.fish ~/.config/fish/env.fish && \
+sudo --preserve-env=HOME -u $USER ln -rsfn config.fish ~/.config/fish/config.fish && \
+sudo --preserve-env=HOME -u $USER ln -rsfn config.fish ~/.config/fish/env.fish && \
 
 log "Installing vim bundles:" && \
-sudo -u $USER ./apt-init/installers/pathogen.sh && \
+sudo --preserve-env=HOME -u $USER ./apt-init/installers/pathogen.sh && \
 
 log "Installing Fisherman:" && \
-sudo -u $USER \
+sudo --preserve-env=HOME -u $USER \
   curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs git.io/fisher && \
 
 log "Installing fish plugins:" && \
-sudo -u $USER fish -c "fisher add edc/bass" && \
+sudo --preserve-env=HOME -u $USER fish -c "fisher add edc/bass" && \
 
 log "Installing tmux plugin manager:" && \
 rm -rf ~/.tmux/plugins/tmp && \
-sudo -u $USER git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && \
+sudo --preserve-env=HOME -u $USER git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && \
 
 log "Installing .tmux.conf:" && \
-sudo -u $USER ln -rsfn .tmux.conf ~/.tmux.conf
+sudo --preserve-env=HOME -u $USER ln -rsfn .tmux.conf ~/.tmux.conf
