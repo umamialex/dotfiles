@@ -4,7 +4,7 @@ alias dev="cd ~/Development"
 alias p="dev; and cd personal"
 alias agg="dev; and cd athletes.gg"
 alias kordami="dev; and cd kordami"
-alias tenfold="dev; and cd tenfold"
+alias grafana="dev; and cd grafana"
 alias tapi="tmux a -t agg-ms-api"
 alias tapp="tmux a -t agg-app"
 
