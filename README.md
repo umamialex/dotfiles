@@ -51,6 +51,7 @@ My personal dotfiles.
     ```
     > powercfg -h off
     ```
+1. Disable extraneous audio devices
 
 ## WSL Init
 Compatible with Ubuntu v20.04+
