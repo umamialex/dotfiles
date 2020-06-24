@@ -24,4 +24,6 @@ setenv AGG_SUCCESS_REDIRECT http://localhost:8080/profile/settings
 setenv AGG_DB_URL mongodb://localhost:27017
 setenv AGG_CONTENTFUL_FETCH_INTERVAL 900
 
-. ~/.config/fish/env.fish
+if test -e ~/.config/fish/env.fish
+  . ~/.config/fish/env.fish
+end
