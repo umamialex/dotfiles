@@ -12,7 +12,7 @@ My personal dotfiles.
 
 ## Windows
 
-1. Install Windows 10 N
+1. Install Windows 10
 1. Disable all data collection
 1. Disable Cortana
 1. Disable UAC
@@ -23,11 +23,10 @@ My personal dotfiles.
     * [GeForce Experience](https://www.nvidia.com/en-us/geforce/geforce-experience/)
     * Power management mode: `Prefer maximum performance`
     * Texture filtering - Quality: `High performance`
-1. Install utilities:
-    * [GPU-Z](https://www.techpowerup.com/download/techpowerup-gpu-z/)
-    * [HWMonitor](https://www.cpuid.com/softwares/hwmonitor.html)
-    * [Slack](https://slack.com/downloads/windows)
-    * [WSLtty](https://github.com/mintty/wsltty/releases)
+    * Disable In-Game Overlay
+    * Disable `Reward is available` desktop notification
+    * Enable `Automatically download driver updates...`
+1. Update monitor refresh rate
 1. Enable WSL
     ```
     > dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
@@ -42,6 +41,16 @@ My personal dotfiles.
     > wsl --set-default-version 2
     ```
 1. Install `Ubuntu` from Microsoft Store
+1. Install utilities:
+    * [GPU-Z](https://www.techpowerup.com/download/techpowerup-gpu-z/)
+    * [HWMonitor](https://www.cpuid.com/softwares/hwmonitor.html)
+    * [Slack](https://slack.com/downloads/windows)
+    * [WSLtty](https://github.com/mintty/wsltty/releases)
+1. Set power plan to High Performance (AMD Ryzen specific if applicable)
+1. Disable hibernation (admin cmd prompt)
+    ```
+    > powercfg -h off
+    ```
 
 ## WSL Init
 Compatible with Ubuntu v20.04+
