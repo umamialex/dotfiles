@@ -35,4 +35,5 @@ rm -rf ~/.tmux/plugins/tmp && \
 sudo --preserve-env=HOME -u $USER git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && \
 
 log "Installing .tmux.conf:" && \
-sudo --preserve-env=HOME -u $USER ln -rsfn .tmux.conf ~/.tmux.conf
+sudo --preserve-env=HOME -u $USER ln -rsfn .tmux.conf ~/.tmux.conf && \
+sudo --preserve-env=HOME -u $USER ./apt-init/installers/tpm.sh
