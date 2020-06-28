@@ -20,10 +20,12 @@ Plugin 'mhartington/oceanic-next'
 Plugin 'ruanyl/coverage.vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'styled-components/vim-styled-components'
+Plugin 'PProvost/vim-ps1'
 call vundle#end()
 
 filetype plugin indent on
 
+set shell=/bin/bash
 set smartindent
 set tabstop=2
 set softtabstop=2
@@ -63,4 +65,5 @@ if has("autocmd")
 
   autocmd BufNewFile,BufRead *.eslintrc set syntax=json
   autocmd BufNewFile,BufRead *.babelrc set syntax=json
+  autocmd BufNewFile,BufRead *.ps1 set syntax=ps1
 endif
