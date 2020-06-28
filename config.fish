@@ -5,6 +5,7 @@ alias p="dev; and cd personal"
 alias agg="dev; and cd athletes.gg"
 alias kordami="dev; and cd kordami"
 alias grafana="dev; and cd grafana"
+alias g="grafana"
 alias tapi="tmux a -t agg-ms-api"
 alias tapp="tmux a -t agg-app"
 
