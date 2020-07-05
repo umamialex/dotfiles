@@ -21,6 +21,7 @@ Plugin 'ruanyl/coverage.vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'styled-components/vim-styled-components'
 Plugin 'PProvost/vim-ps1'
+Plugin 'leafgarland/typescript-vim'
 call vundle#end()
 
 filetype plugin indent on
@@ -55,7 +56,7 @@ let g:js_context_colors_highlight_function_names = 1
 let g:js_context_colors_block_scope = 1
 let g:js_context_colors_jsx = 1
 
-let g:ale_linter_aliases = {'jsx': ['css', 'javascript'], 'js': ['css', 'javascript']}
+let g:ale_linter_aliases = {'jsx': ['css', 'javascript'], 'js': ['css', 'javascript'], 'ts': ['css', 'javascript']}
 let b:ale_linters = ['flake8', 'eslint', 'yamllint', 'stylelint']
 
 au FileType java setl sw=4 sts=4 et
