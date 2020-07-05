@@ -42,6 +42,7 @@ My personal dotfiles.
     * Search `WSL Terminal` in start menu
     * Open file location
     * Right click -> Properties -> Compatibility -> Run this program as administrator
+1. Install font `Source Code Pro` and update WSLtty font and set to medium weight
 1. Set power plan to High Performance (AMD Ryzen specific if applicable)
 1. Disable extraneous audio devices
 
