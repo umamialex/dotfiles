@@ -50,5 +50,5 @@ My personal dotfiles.
 Compatible with Ubuntu v20.04+
 
 ```
-> sudo --preserve-env=HOME USER=$USER ./apt-init-wsl
+> sudo --preserve-env=HOME USER=$USER ./apt-init-wsl.sh
 ```
