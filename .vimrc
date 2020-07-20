@@ -22,6 +22,7 @@ Plugin 'nvie/vim-flake8'
 Plugin 'styled-components/vim-styled-components'
 Plugin 'PProvost/vim-ps1'
 Plugin 'leafgarland/typescript-vim'
+Plugin 'google/vim-jsonnet'
 call vundle#end()
 
 filetype plugin indent on
@@ -67,4 +68,5 @@ if has("autocmd")
   autocmd BufNewFile,BufRead *.eslintrc set syntax=json
   autocmd BufNewFile,BufRead *.babelrc set syntax=json
   autocmd BufNewFile,BufRead *.ps1 set syntax=ps1
+  autocmd BufNewFile,BufRead *.jsonnet set syntax=jsonnet
 endif
