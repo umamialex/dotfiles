@@ -8,6 +8,7 @@ alias grafana="dev; and cd grafana"
 alias g="grafana"
 alias tapi="tmux a -t agg-ms-api"
 alias tapp="tmux a -t agg-app"
+alias exe="explorer.exe ."
 
 setenv JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 setenv ANDROID_HOME /home/suitupalex/Android
