@@ -45,7 +45,6 @@ highlight Visual cterm=reverse ctermbg=NONE
 highlight ALEError ctermbg=52
 
 set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
 let g:vim_markdown_folding_disabled = 1
