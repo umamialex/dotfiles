@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Add Helm signing key:" && \
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add - && \

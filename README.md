@@ -46,9 +46,9 @@ My personal dotfiles.
 1. Set power plan to High Performance (AMD Ryzen specific if applicable)
 1. Disable extraneous audio devices
 
-## WSL Init
+## Ubuntu (WSL)
 Compatible with Ubuntu v20.04+
 
 ```
-> sudo --preserve-env=HOME USER=$USER ./apt-init-wsl.sh
+> sudo --preserve-env=HOME USER=$USER ./ubuntu/setup.sh
 ```

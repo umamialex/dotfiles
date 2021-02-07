@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Installing git config:" && \
 sudo --preserve-env=HOME -u $USER ln -rsfn .gitconfig ~/.gitconfig && \
@@ -21,7 +21,7 @@ log "Installing fish config:" && \
 sudo --preserve-env=HOME -u $USER ln -rsfn config.fish ~/.config/fish/config.fish && \
 
 log "Installing vim bundles:" && \
-sudo --preserve-env=HOME -u $USER ./apt-init/installers/pathogen.sh && \
+sudo --preserve-env=HOME -u $USER ./ubuntu/scripts/installers/pathogen.sh && \
 
 log "Installing Fisherman:" && \
 sudo --preserve-env=HOME -u $USER fish -c \
@@ -38,4 +38,4 @@ sudo --preserve-env=HOME -u $USER git clone https://github.com/tmux-plugins/tpm 
 
 log "Installing .tmux.conf:" && \
 sudo --preserve-env=HOME -u $USER ln -rsfn .tmux.conf ~/.tmux.conf && \
-sudo --preserve-env=HOME -u $USER ./apt-init/installers/tpm.sh
+sudo --preserve-env=HOME -u $USER ./ubuntu/scripts/installers/tpm.sh

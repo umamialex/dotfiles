@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Adding kubectl signing key:" && \
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \

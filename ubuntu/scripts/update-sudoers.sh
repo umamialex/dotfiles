@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Adding nopassd to sudoers:" && \
 echo "" >> /etc/sudoers && \

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Installing aptitude:" && \
 apt-get install \

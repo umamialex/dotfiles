@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Adding yarn repo:" && \
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \

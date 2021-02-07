@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 VERSION=node_14.x && \
 DISTRO="$(lsb_release -s -c)" && \

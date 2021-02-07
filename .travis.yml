@@ -5,6 +5,6 @@ install:
   - sudo aptitude hold openssh-client
   - sudo aptitude hold openssh-server
   - sudo aptitude hold openssh-sftp-server
-  - sudo --preserve-env=HOME USER=$USER ./apt-init-wsl.sh
+  - sudo --preserve-env=HOME USER=$USER ./ubuntu/setup.sh
 script:
-  - ./tests/apt-init.sh
+  - ./ubuntu/test.sh

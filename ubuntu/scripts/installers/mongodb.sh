@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Adding MongoDB APT key:" && \
 wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -

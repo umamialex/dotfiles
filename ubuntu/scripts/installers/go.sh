@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./apt-init/log.sh && \
+. ./ubuntu/scripts/log.sh && \
 
 log "Downloading GoLang 1.15.8:" && \
 wget -O go.tar.gz "https://golang.org/dl/go1.15.8.linux-amd64.tar.gz" && \
