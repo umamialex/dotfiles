@@ -2,5 +2,5 @@
 
 . ./apt-init/log.sh && \
 
-log "[MANUAL] Updating default editor:" && \
-update-alternatives --config editor
+log "Updating default editor:" && \
+update-alternatives --set editor /usr/bin/vim.basic
