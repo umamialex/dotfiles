@@ -28,4 +28,5 @@ aptitude install \
   python3-pip \
   redis-server \
   kubectl \
-  helm
+  helm \
+  unzip
