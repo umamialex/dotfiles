@@ -10,6 +10,8 @@ alias tapi="tmux a -t agg-ms-api"
 alias tapp="tmux a -t agg-app"
 alias e="explorer.exe ."
 alias k="kubectl"
+alias fw="powershell.exe ~/Development/personal/dotfiles/windows/wsl-firewall.ps1"
+alias s="fw && sudo service ssh start"
 
 setenv JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 setenv ANDROID_HOME /home/suitupalex/Android
