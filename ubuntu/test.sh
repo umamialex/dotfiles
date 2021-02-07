@@ -20,5 +20,8 @@ fish -c "
   tmux -V && \
   ag --version && \
   htop --version && \
-  git --version
+  git --version && \
+
+  kubectl version && \
+  helm version
 "

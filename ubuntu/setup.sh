@@ -12,6 +12,7 @@
 ./ubuntu/scripts/repositories/vim.sh && \
 ./ubuntu/scripts/repositories/yarn.sh && \
 ./ubuntu/scripts/repositories/kubectl.sh && \
+./ubuntu/scripts/repositories/helm.sh && \
 
 ./ubuntu/scripts/update.sh && \
 
