@@ -11,10 +11,8 @@ eslint --version && \
 feathers --version && \
 ngrok --version && \
 
-cassandra -v && \
 redis-cli --version && \
 redis-server --version && \
-mongod --version && \
 
 fish -v && \
 vim --version && \
