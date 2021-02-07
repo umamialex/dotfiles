@@ -3,12 +3,11 @@
 . ./apt-init/log.sh && \
 
 log "Adding MongoDB APT key:" && \
-wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add - && \
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
 
 log "Adding MongoDB APT source:" && \
-echo \
-  "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" \
-  | tee /etc/apt/sources.list.d/mongodb-org-4.2.list \
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" \
+  | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 && \
 
 log "Updating APT:" && \
@@ -28,12 +27,6 @@ apt-get install \
   -f \
   mongodb-org \
 && \
-
-log "Adding init.d service script:" && \
-wget https://raw.githubusercontent.com/mongodb/mongo/master/debian/init.d \
-  -O /etc/init.d/mongod \
-&& \
-chmod 755 /etc/init.d/mongod && \
 
 log "Starting mongod service:" && \
 service mongod start
