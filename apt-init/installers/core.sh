@@ -11,4 +11,5 @@ aptitude install \
   apt-transport-https \
   ca-certificates \
   software-properties-common \
-  curl
+  curl \
+  gnupg2

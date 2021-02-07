@@ -29,6 +29,7 @@ sudo --preserve-env=HOME -u $USER \
 
 log "Installing fish plugins:" && \
 sudo --preserve-env=HOME -u $USER fish -c "fisher add edc/bass" && \
+sudo --preserve-env=HOME -u $USER fish -c "fisher add evanlucas/fish-kubectl-completions" && \
 sudo --preserve-env=HOME -u $USER fish -c "fisher add fishpkg/fish-prompt-metro" && \
 
 log "Installing tmux plugin manager:" && \

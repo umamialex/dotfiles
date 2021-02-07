@@ -11,6 +11,7 @@
 ./apt-init/prerequisites/node.sh && \
 ./apt-init/prerequisites/vim.sh && \
 ./apt-init/prerequisites/yarn.sh && \
+./apt-init/prerequisites/kubectl.sh && \
 
 ./apt-init/update.sh && \
 
