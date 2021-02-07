@@ -21,7 +21,6 @@ fi && \
 ./apt-init/installers/dev.sh && \
 ./apt-init/installers/config.sh && \
 ./apt-init/installers/go.sh && \
-./apt-init/installers/cassandra.sh && \
 ./apt-init/installers/mongodb.sh && \
 ./apt-init/installers/yarn-global.sh && \
 
