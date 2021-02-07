@@ -27,4 +27,5 @@ aptitude install \
   python3-dev \
   python3-pip \
   redis-server \
-  kubectl
+  kubectl \
+  helm
