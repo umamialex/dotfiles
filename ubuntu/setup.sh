@@ -32,7 +32,8 @@ echo "fish; exit" >> /home/$USER/.bashrc && \
 ./ubuntu/scripts/update-sudoers.sh && \
 
 if [[ "$CI" != "true" ]]; then
-  ./ubuntu/scripts/update-defaults.sh
+  ./ubuntu/scripts/update-defaults.sh && \
+  sudo --preserve-env=HOME -u $USER ./ubuntu/scripts/installers/git.sh
 fi && \
 
 log "Done!"
