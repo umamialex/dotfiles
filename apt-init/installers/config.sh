@@ -24,13 +24,13 @@ log "Installing vim bundles:" && \
 sudo --preserve-env=HOME -u $USER ./apt-init/installers/pathogen.sh && \
 
 log "Installing Fisherman:" && \
-sudo --preserve-env=HOME -u $USER \
-  curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs git.io/fisher && \
+sudo --preserve-env=HOME -u $USER fish -c \
+  "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher" && \
 
 log "Installing fish plugins:" && \
-sudo --preserve-env=HOME -u $USER fish -c "fisher add edc/bass" && \
-sudo --preserve-env=HOME -u $USER fish -c "fisher add evanlucas/fish-kubectl-completions" && \
-sudo --preserve-env=HOME -u $USER fish -c "fisher add fishpkg/fish-prompt-metro" && \
+sudo --preserve-env=HOME -u $USER fish -c "fisher install edc/bass" && \
+sudo --preserve-env=HOME -u $USER fish -c "fisher install evanlucas/fish-kubectl-completions" && \
+sudo --preserve-env=HOME -u $USER fish -c "fisher install fishpkg/fish-prompt-metro" && \
 
 log "Installing tmux plugin manager:" && \
 rm -rf ~/.tmux/plugins/tmp && \
