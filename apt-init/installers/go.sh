@@ -22,7 +22,6 @@ fish -c "logcli --version" && \
 log "Installing jsonnet:" && \
 fish -c "go get github.com/google/go-jsonnet/cmd/jsonnet" && \
 fish -c "jsonnet --version" && \
-fish -c "jsonnetfmt --version" && \
 
 log "Installing jb:" && \
 fish -c "go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb" && \

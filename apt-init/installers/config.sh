@@ -33,7 +33,7 @@ sudo --preserve-env=HOME -u $USER fish -c "fisher install evanlucas/fish-kubectl
 sudo --preserve-env=HOME -u $USER fish -c "fisher install fishpkg/fish-prompt-metro" && \
 
 log "Installing tmux plugin manager:" && \
-rm -rf ~/.tmux/plugins/tmp && \
+rm -rf ~/.tmux/plugins/tpm && \
 sudo --preserve-env=HOME -u $USER git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && \
 
 log "Installing .tmux.conf:" && \
