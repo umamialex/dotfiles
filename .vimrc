@@ -23,6 +23,7 @@ Plugin 'styled-components/vim-styled-components'
 Plugin 'PProvost/vim-ps1'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'google/vim-jsonnet'
+Plugin 'Exafunction/codeium.vim'
 call vundle#end()
 
 filetype plugin indent on
