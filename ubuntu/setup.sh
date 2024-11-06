@@ -24,6 +24,7 @@ fi && \
 ./ubuntu/scripts/installers/config.sh && \
 ./ubuntu/scripts/installers/go.sh && \
 ./ubuntu/scripts/installers/yarn-global.sh && \
+./ubuntu/scripts/installers/pip.sh && \
 
 # Set fish as default shell
 log "Setting fish as default shell:" && \
