@@ -8,3 +8,24 @@ apt-get update \
   -q \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
+  && \
+
+apt-get autoclean \
+  -y \
+  -q \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold" \
+  && \
+
+apt-get clean \
+  -y \
+  -q \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold" \
+  && \
+
+apt-get autoremove \
+  -y \
+  -q \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold" \
