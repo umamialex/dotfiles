@@ -12,6 +12,4 @@ yarn global add \
   eslint-plugin-jsx-a11y \
   eslint-plugin-react \
   ngrok \
-  expo-cli \
-  @feathersjs/cli \
   typescript
