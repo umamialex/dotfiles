@@ -24,6 +24,9 @@ log "Installing vim bundles:" && \
 sudo --preserve-env=HOME -u $USER ./ubuntu/scripts/installers/pathogen.sh && \
 
 log "Installing Fisherman:" && \
+sudo --preserve-env=HOME -u $USER rm -rf ~/.config/fish/completions && \
+sudo --preserve-env=HOME -u $USER rm -rf ~/.config/fish/conf.d && \
+sudo --preserve-env=HOME -u $USER rm -rf ~/.config/fish/functions && \
 sudo --preserve-env=HOME -u $USER fish -c \
   "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher" && \
 
