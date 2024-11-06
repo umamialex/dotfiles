@@ -12,10 +12,6 @@ rm go.tar.gz && \
 log "Installing GoLang packages:" && \
 
 if [[ "$CI" != "true" ]]; then
-  log "Installing tk:" && \
-  fish -c "go get github.com/grafana/tanka/cmd/tk" && \
-  fish -c "tk --version" && \
-
   log "Installing logcli:" && \
   fish -c "go get github.com/grafana/loki/cmd/logcli" && \
   fish -c "logcli --version" && \
