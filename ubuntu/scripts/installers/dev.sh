@@ -17,6 +17,7 @@ aptitude install \
   build-essential \
   fish \
   git \
+  git-lfs \
   htop \
   openjdk-8-jdk \
   nodejs \
