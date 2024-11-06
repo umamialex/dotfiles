@@ -2,6 +2,10 @@
 
 . ./ubuntu/scripts/log.sh && \
 
+log "Install corepack:" && \
+
+env COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack enable && \
+
 log "Install global yarn packages:" && \
 
 yarn global add \
