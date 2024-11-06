@@ -31,7 +31,7 @@ sudo --preserve-env=HOME -u $USER fish -c \
   "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher" && \
 
 log "Installing fish plugins:" && \
-sudo --preserve-env=HOME -u $USER fish -c "fisher install IlanCosman/tide" && \
+sudo --preserve-env=HOME -u $USER fish -c "fisher install ilancosman/tide@v6" && \
 sudo --preserve-env=HOME -u $USER fish -c "fisher install evanlucas/fish-kubectl-completions" && \
 sudo --preserve-env=HOME -u $USER fish -c "fisher install fishpkg/fish-prompt-metro" && \
 
