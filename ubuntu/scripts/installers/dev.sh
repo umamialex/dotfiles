@@ -16,6 +16,8 @@ aptitude install \
   libsystemd0 \
   build-essential \
   fish \
+  golang-go \
+  gccgo-go \
   git \
   git-lfs \
   htop \

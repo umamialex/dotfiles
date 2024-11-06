@@ -22,7 +22,6 @@ fi && \
 
 ./ubuntu/scripts/installers/dev.sh && \
 ./ubuntu/scripts/installers/config.sh && \
-./ubuntu/scripts/installers/go.sh && \
 ./ubuntu/scripts/installers/yarn-global.sh && \
 ./ubuntu/scripts/installers/pip.sh && \
 
