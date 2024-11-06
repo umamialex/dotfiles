@@ -2,7 +2,7 @@
 
 . ./ubuntu/scripts/log.sh && \
 
-VERSION=node_14.x && \
+VERSION=node_23.x && \
 DISTRO="$(lsb_release -s -c)" && \
 
 log "Add NodeSource signing key:" && \
