@@ -15,8 +15,8 @@ curl -fsSL "https://raw.githubusercontent.com/jorgebucaran/fisher/$FISHER_VERSIO
 echo "$FISHER_SHA256  $fisher_file" | sha256sum -c --quiet -
 fish -c "source '$fisher_file'; and fisher update"
 
-# vim: generate help tags for the plugins chezmoi installed as native packages
-vim -es -u NONE -i NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
+# vim: generate help tags for the plugins chezmoi installed as native packages (only doc folders that have files)
+vim -es -u NONE -i NONE -N -c 'packloadall' -c "for d in globpath(&rtp, 'doc', 0, 1) | if d =~# 'pack' && !empty(glob(d . '/*', 0, 1)) | execute 'helptags' fnameescape(d) | endif | endfor" -c 'qa!'
 
 # tmux: install plugins listed in .tmux.conf (tpm needs a running server)
 tmux new-session -d -s chezmoi-tpm "sleep 60"
