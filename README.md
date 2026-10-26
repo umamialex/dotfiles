@@ -50,8 +50,6 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
 1. Launch Chrome with `--disable-features=UseEcoQoSForBackgroundProcess,CalculateNativeWinOcclusion`
     (add it to the shortcut target as a single comma-separated flag) and turn off
     `Continue running background apps when Google Chrome is closed`
-1. Install [SoundVolumeView](https://www.nirsoft.net/utils/sound_volume_view.html) to `C:\Tools\SoundVolumeView`
-    (used by the audio hotkeys in `multimedia-control.ahk`)
 1. Install the vendor apps winget does not carry: Adobe apps (through Creative Cloud), ASUS Armoury Crate and Aura,
     the GoXLR app and driver, MOZA Pit House, SimHub, Samsung Magician and the AMD chipset driver
 1. Set the Windows Terminal font to `Source Code Pro` and set to medium weight
