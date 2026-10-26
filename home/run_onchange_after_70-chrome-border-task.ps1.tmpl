@@ -7,19 +7,15 @@ $name = 'ChromeBlackBorders'
 $script = Join-Path $HOME 'Scripts\Set-ChromeBorder.ps1'
 $user = "$env:USERDOMAIN\$env:USERNAME"
 
-try {
-  $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`" -Mode Watch -Color Black"
-  $trigger = New-ScheduledTaskTrigger -AtLogOn -User $user
-  $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive
-  $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew
+$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`" -Mode Watch -Color Black"
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User $user
+$principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew
 
-  Register-ScheduledTask -TaskName $name -Description 'Sets Chrome window borders to black (OLED).' -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
+Register-ScheduledTask -TaskName $name -Description 'Sets Chrome window borders to black (OLED).' -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
 
-  # restart the watcher so it runs the updated script
-  Stop-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue
-  Start-ScheduledTask -TaskName $name
-  Write-Host "Registered and started scheduled task $name"
-} catch {
-  Write-Warning "Could not register the $name scheduled task: $_"
-}
+# restart the watcher so it runs the updated script
+Stop-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue
+Start-ScheduledTask -TaskName $name
+Write-Host "Registered and started scheduled task $name"
 {{- end }}
