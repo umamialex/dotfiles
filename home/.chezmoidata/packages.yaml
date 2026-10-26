@@ -17,6 +17,7 @@ packages:
     - 7zip.7zip
     - Adobe.CreativeCloud
     - AutoHotkey.AutoHotkey
+    - beeradmoore.dlss-swapper
     - CPUID.HWMonitor
     - Discord.Discord
     - Garmin.Express
