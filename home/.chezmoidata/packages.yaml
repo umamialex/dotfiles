@@ -17,6 +17,7 @@ packages:
   winget:
     - 7zip.7zip
     - ajeetdsouza.zoxide
+    - astral-sh.ruff
     - AutoHotkey.AutoHotkey
     - beeradmoore.dlss-swapper
     - CPUID.HWMonitor
@@ -43,6 +44,7 @@ packages:
     - TechPowerUp.GPU-Z
     - Valve.Steam
     - VideoLAN.VLC
+    - vim.vim
     - Zoom.Zoom
   # modules installed from the PowerShell Gallery, pinned to an exact version
   powershell_modules:
