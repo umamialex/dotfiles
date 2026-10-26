@@ -1,7 +1,10 @@
 #Requires AutoHotkey v2.0
 
 ; --- CONFIGURATION PATHS ---
-svvPath := "C:\Tools\SoundVolumeView\SoundVolumeView.exe"
+; winget links SoundVolumeView here; the manual install location is the fallback
+svvPath := EnvGet("LOCALAPPDATA") . "\Microsoft\WinGet\Links\SoundVolumeView.exe"
+if !FileExist(svvPath)
+    svvPath := "C:\Tools\SoundVolumeView\SoundVolumeView.exe"
 
 ; Target names or descriptions as recognized by SoundVolumeView
 tv_qcq95s := "QCQ95S"
@@ -11,8 +14,9 @@ klipsch   := "SPDIF Interface"   ; Or "2- Klipsch R-15PM"
 SwitchDisplay(modeText, modeNum) {
     try {
         Run("DisplaySwitch.exe " . modeText)
+    } catch {
+        Run("DisplaySwitch.exe " . modeNum)
     }
-    Run("DisplaySwitch.exe " . modeNum)
 }
 
 ; --- COMBO MACROS ---
