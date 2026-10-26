@@ -1,6 +1,6 @@
 {{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
-# packages.yaml hash: {{ include ".chezmoidata/packages.yaml" | sha256sum }}
+# apt packages hash: {{ .packages.apt | toJson | sha256sum }}
 set -euo pipefail
 
 sudo apt-get update -q
