@@ -15,7 +15,13 @@ foreach ($key in 'HKCU:\Software\Vim\Gvim', 'HKLM:\Software\Vim\Gvim', 'HKLM:\So
 if (-not $vim) { $vim = (Get-Command vim -ErrorAction SilentlyContinue).Source }
 if (-not $vim) { throw 'vim.exe not found: the Vim installer did not register itself' }
 
-# generate help tags for the plugins chezmoi installed as native packages
-& $vim -es -u NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
-if ($LASTEXITCODE -ne 0) { throw "vim exited with code $LASTEXITCODE" }
+# generate help tags for the plugins chezmoi installed as native packages; -es hides Vim's errors,
+# so have it log them to a file we can report if it fails
+$log = Join-Path $env:TEMP 'vim-helptags.log'
+Remove-Item $log -ErrorAction SilentlyContinue
+& $vim "-V1$log" -es -u NONE -i NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
+if ($LASTEXITCODE -ne 0) {
+  $details = if (Test-Path $log) { Get-Content $log -Raw } else { '(Vim wrote no log)' }
+  throw "vim exited with code $LASTEXITCODE (using $vim)`n$details"
+}
 {{- end }}
