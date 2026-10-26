@@ -9,7 +9,7 @@ set -euo pipefail
 files="$(cat)"
 
 # files no job looks at
-untested='^(README\.md|LICENSE|\.gitignore|backups/|windows/)'
+untested='^(README\.md|LICENSE|\.gitignore|backups/)'
 # the audit scripts are only linted, never run, so only the lint job cares
 audit='^scripts/audit-'
 # files only the Windows apply uses

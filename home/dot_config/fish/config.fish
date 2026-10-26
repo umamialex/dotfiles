@@ -14,9 +14,6 @@ if status is-interactive
   abbr -a grafana 'cd ~/Development/grafana'
   abbr -a e 'explorer.exe .'
 
-  alias fw='powershell.exe ~/Development/personal/dotfiles/windows/wsl-firewall.ps1'
-  alias s='fw && sudo service ssh start'
-
   if type -q mise
     mise activate fish | source
   end

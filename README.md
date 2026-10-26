@@ -40,7 +40,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Installs Vim from winget (9.2) with the same config as Linux (`~/_vimrc` and `~/vimfiles`)
     * Sets up the PowerShell 7 profile (`~/.config/powershell/profile.ps1`, loaded through a stub at your real `$PROFILE`):
       history suggestions, `eza` for `ls`, `zoxide`, fzf key bindings (PSFzf), a starship prompt, and the `dev`, `p`, `g` shortcuts
-    * Disables Multiplane Overlay on NVIDIA GPUs (fixes Chrome freezing with several video streams, needs a restart)
+    * Disables Multiplane Overlay (fixes Chrome freezing with several video streams, needs a restart)
     * Keeps Chrome windows on black, square borders with a logon task (`~/Scripts/Set-ChromeBorder.ps1`)
     * Installs AutoHotkey v2 and starts `~/Scripts/AutoHotkey/multimedia-control.ahk` at sign-in
     * Disables the startup entries listed in `packages.startup_disable` that exist on the machine
@@ -101,7 +101,6 @@ and `run_once_*` scripts run once per machine.
 | `home/AppData/` | app settings seeded on Windows with `create_` files, which chezmoi writes only if the file is missing (MultiViewer, FancyZones, Windows Terminal) |
 | `home/dot_config/powershell/profile.ps1` | shared PowerShell 7 profile, with a starship prompt config in `home/dot_config/starship.toml` |
 | `scripts/audit-packages.*` | lists installed packages that aren't in `packages.yaml`, and the reverse (see below) |
-| `windows/wsl-firewall.ps1` | forwards WSL ports, used by the `fw` alias |
 | `fonts/` | `Source Code Pro`, installed by the Windows scripts |
 
 ## Auditing packages
