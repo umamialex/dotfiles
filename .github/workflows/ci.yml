@@ -197,7 +197,7 @@ jobs:
           powercfg /getactivescheme
           wsl --status
           if ((git config --global user.email) -ne 'ci@example.com') { throw 'gitconfig not rendered' }
-          foreach ($path in '.vimrc', '.config') {
+          foreach ($path in '.vimrc', '.config\fish', '.config\mise') {
             if (Test-Path (Join-Path $HOME $path)) { throw "$path should be ignored on Windows" }
           }
           if (-not (Test-Path (Join-Path $HOME '.tmux.conf'))) { throw '.tmux.conf not applied' }
