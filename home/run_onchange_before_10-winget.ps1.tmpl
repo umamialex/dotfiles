@@ -1,0 +1,20 @@
+{{- if eq .chezmoi.os "windows" -}}
+# winget packages hash: {{ .packages.winget | toJson | sha256sum }}
+$ErrorActionPreference = 'Stop'
+
+$ids = @('{{ .packages.winget | join "','" }}')
+
+foreach ($id in $ids) {
+  winget list --id $id --exact --source winget --accept-source-agreements | Out-Null
+  if ($LASTEXITCODE -eq 0) {
+    Write-Host "$id already installed"
+    continue
+  }
+
+  Write-Host "Installing $id"
+  winget install --id $id --exact --source winget --silent --accept-package-agreements --accept-source-agreements
+  if ($LASTEXITCODE -ne 0) {
+    throw "winget install failed for $id (exit code $LASTEXITCODE)"
+  }
+}
+{{- end }}
