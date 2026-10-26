@@ -25,7 +25,45 @@ env:
   TRUFFLEHOG_SHA256: bdbea0508e439b144f49de14e775908de5f902f3d14ea7ae8354bae72b0b72ef
 
 jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      lint: ${{ steps.decide.outputs.lint }}
+      linux: ${{ steps.decide.outputs.linux }}
+      windows: ${{ steps.decide.outputs.windows }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Decide which jobs this change needs
+        id: decide
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          # a PR is compared with its base branch, not with the previous push, so a failure from
+          # an earlier push can't be hidden by a later push that happens to skip that job
+          base=""
+          if [ "$EVENT" = pull_request ]; then
+            base="$PR_BASE"
+          elif [ "$EVENT" = push ]; then
+            base="$PUSH_BEFORE"
+          fi
+          if [ -n "$base" ] && ! [[ "$base" =~ ^0+$ ]] && git cat-file -e "$base^{commit}"; then
+            git diff --name-only "$base" HEAD | ./scripts/ci-changes.sh | tee -a "$GITHUB_OUTPUT"
+          else
+            # scheduled runs, manual runs and new branches run everything
+            printf '%s\n' lint=true linux=true windows=true | tee -a "$GITHUB_OUTPUT"
+          fi
+
   lint:
+    needs: changes
+    if: needs.changes.outputs.lint == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -104,6 +142,8 @@ jobs:
         run: trufflehog git "file://$GITHUB_WORKSPACE" --no-update --results=verified,unknown --fail
 
   linux:
+    needs: changes
+    if: needs.changes.outputs.linux == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -154,6 +194,8 @@ jobs:
           chezmoi --source "$GITHUB_WORKSPACE" verify
 
   windows:
+    needs: changes
+    if: needs.changes.outputs.windows == 'true'
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
