@@ -60,7 +60,7 @@ jobs:
 
       - name: Check shell scripts
         run: |
-          for f in rendered/*.sh; do
+          for f in rendered/*.sh scripts/*.sh; do
             bash -n "$f"
             shellcheck "$f"
           done
@@ -71,7 +71,7 @@ jobs:
       - name: Check PowerShell scripts
         shell: pwsh
         run: |
-          foreach ($file in Get-ChildItem rendered -Filter *.ps1) {
+          foreach ($file in Get-ChildItem rendered, scripts -Filter *.ps1) {
             $errors = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors)
             if ($errors.Count -gt 0) {
