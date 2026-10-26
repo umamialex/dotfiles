@@ -66,7 +66,7 @@ Open Ubuntu, then:
 > sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply umamialex
 ```
 
-This installs the apt packages, [mise](https://mise.jdx.dev) tools (node, go, kubectl, helm, gh),
+This installs the apt packages, [mise](https://mise.jdx.dev) tools (node, go, kubectl, helm, gh, trufflehog),
 the fish/vim/tmux plugins, and sets fish as the login shell.
 
 ## Day to day
@@ -107,6 +107,15 @@ chezmoi only knows the lists in `packages.yaml`, so these scripts compare them w
 Each prints packages that are installed but not tracked, and tracked packages that are missing.
 Runtimes and system packages are skipped through `packages.audit_ignore`.
 `chezmoi unmanaged <dir>` does the same for files.
+
+## Secret scanning
+
+CI scans the full git history with [TruffleHog](https://github.com/trufflesecurity/trufflehog) (free, AGPL-3.0)
+and fails on verified or unverifiable secrets. To scan locally (mise installs `trufflehog`):
+
+```
+> trufflehog git file://. --no-update --no-verification
+```
 
 ## Maintenance
 
