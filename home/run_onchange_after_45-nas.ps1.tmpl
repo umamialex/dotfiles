@@ -1,0 +1,45 @@
+{{- $work := and (hasKey . "work") .work -}}
+{{- $nas := "" -}}
+{{- if hasKey . "nas_host" -}}
+{{-   $nas = .nas_host -}}
+{{- end -}}
+{{- if and (eq .chezmoi.os "windows") (not $work) $nas -}}
+# NAS host: {{ $nas }}
+$ErrorActionPreference = 'Stop'
+
+# Maps G: to the NAS share. The credentials come from Windows Credential Manager, so enter them
+# once in Explorer or with cmdkey. This script never stores a password.
+$nas = '{{ $nas }}'
+$remote = "\\$nas\Google Drive"
+
+# skip when the NAS is out of reach, such as away from home
+$reachable = $false
+try {
+  $client = [System.Net.Sockets.TcpClient]::new()
+  $reachable = $client.ConnectAsync($nas, 445).Wait(3000) -and $client.Connected
+  $client.Dispose()
+} catch {
+  $reachable = $false
+}
+if (-not $reachable) {
+  Write-Warning "$nas did not answer on port 445, skipping the G: mapping"
+  return
+}
+
+$mapped = Get-SmbMapping -LocalPath 'G:' -ErrorAction SilentlyContinue
+if ($mapped) {
+  if ($mapped.RemotePath -eq $remote) {
+    Write-Host 'G: is already mapped'
+  } else {
+    Write-Warning "G: is mapped to $($mapped.RemotePath), leaving it alone"
+  }
+  return
+}
+if (Test-Path 'G:\') {
+  Write-Warning 'G: is in use by another drive, leaving it alone'
+  return
+}
+
+net use G: $remote /persistent:yes
+if ($LASTEXITCODE -ne 0) { throw "net use failed (exit code $LASTEXITCODE), check the NAS credentials in Credential Manager" }
+{{- end }}
