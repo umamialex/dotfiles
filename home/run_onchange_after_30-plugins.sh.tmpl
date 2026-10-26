@@ -16,7 +16,7 @@ echo "$FISHER_SHA256  $fisher_file" | sha256sum -c --quiet -
 fish -c "source '$fisher_file'; and fisher update"
 
 # vim: generate help tags for the plugins chezmoi installed as native packages
-vim -es -u NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
+vim -es -u NONE -i NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
 
 # tmux: install plugins listed in .tmux.conf (tpm needs a running server)
 tmux new-session -d -s chezmoi-tpm "sleep 60"
