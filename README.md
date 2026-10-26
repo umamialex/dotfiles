@@ -35,6 +35,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
       (L-Connect 3, NZXT CAM, Sunshine) only if you answer yes to the home server prompt
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
     * Disables hibernation and sets the high performance power plan
+    * Disables the OneDrive sync client with a policy
     * Sets up the PowerShell 7 profile (`~/.config/powershell/profile.ps1`, loaded through a stub at your real `$PROFILE`):
       history suggestions, `eza` for `ls`, `zoxide`, fzf key bindings (PSFzf), a starship prompt, and the `dev`, `p`, `g` shortcuts
     * Disables Multiplane Overlay on NVIDIA GPUs (fixes Chrome freezing with several video streams, needs a restart)
