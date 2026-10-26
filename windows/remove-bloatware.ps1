@@ -81,4 +81,8 @@ Get-AppxPackage *Microsoft.ZuneMusic* -AllUsers | Remove-AppxPackage
 # Movies & TV
 Get-AppxPackage *Microsoft.ZuneVideo* -AllUsers | Remove-AppxPackage
 
+# Disable Xbox Game Bar
+reg add HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR /f /t REG_DWORD /v "AppCaptureEnabled" /d 0
+reg add HKEY_CURRENT_USER\System\GameConfigStore /f /t REG_DWORD /v "GameDVR_Enabled" /d 0
+
 echo "Finished removing bloatware."
