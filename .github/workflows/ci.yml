@@ -123,13 +123,20 @@ jobs:
       - name: Smoke test
         run: |
           set -e
+          # interactive, so config.fish activates mise like a real terminal
           for cmd in "fish --version" "git --version" "git lfs version" "tmux -V" "vim --version" \
                      "ag --version" "htop --version" "mise --version" "node -v" "go version" \
-                     "kubectl version --client" "helm version --short" "gh --version" "fisher --version" \
-                     "type -q tide"; do
+                     "kubectl version --client" "helm version --short" "gh --version" "fzf --version" \
+                     "fd --version" "bat --version" "eza --version" "zoxide --version" "fisher --version" \
+                     "type -q tide" "functions -q fzf_configure_bindings" "functions -q z"; do
             echo "+ $cmd"
-            fish -c "$cmd" > /dev/null
+            fish -ic "$cmd" < /dev/null > /dev/null
           done
+          # GitHub's runners ship some of these tools, so check they come from mise
+          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide; do
+            fish -ic "type -p $tool" < /dev/null | grep -q mise || { echo "$tool does not come from mise"; exit 1; }
+          done
+          fish -ic 'functions ls | string match -q "*eza*"' < /dev/null
           fish --version | grep -q 'version 4\.'
           fish -ic 'abbr --query k; and abbr --query dev' < /dev/null
           fish -n "$HOME/.config/fish/config.fish"
