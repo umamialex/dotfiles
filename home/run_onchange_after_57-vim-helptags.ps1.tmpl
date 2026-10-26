@@ -15,11 +15,12 @@ foreach ($key in 'HKCU:\Software\Vim\Gvim', 'HKLM:\Software\Vim\Gvim', 'HKLM:\So
 if (-not $vim) { $vim = (Get-Command vim -ErrorAction SilentlyContinue).Source }
 if (-not $vim) { throw 'vim.exe not found: the Vim installer did not register itself' }
 
-# generate help tags for the plugins chezmoi installed as native packages; -es hides Vim's errors,
-# so have it log them to a file we can report if it fails
+# generate help tags for the plugins chezmoi installed as native packages. Only plugin doc folders that
+# have files are tagged: Vim's installer leaves empty vimfiles\doc folders, which `helptags ALL` rejects (E151).
+# -es hides Vim's errors, so have it log them to a file we can report if it fails
 $log = Join-Path $env:TEMP 'vim-helptags.log'
 Remove-Item $log -ErrorAction SilentlyContinue
-& $vim "-V1$log" -es -u NONE -i NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
+& $vim "-V1$log" -es -u NONE -i NONE -N -c 'packloadall' -c "for d in globpath(&rtp, 'doc', 0, 1) | if d =~# 'pack' && !empty(glob(d . '/*', 0, 1)) | execute 'helptags' fnameescape(d) | endif | endfor" -c 'qa!'
 if ($LASTEXITCODE -ne 0) {
   $details = if (Test-Path $log) { Get-Content $log -Raw } else { '(Vim wrote no log)' }
   throw "vim exited with code $LASTEXITCODE (using $vim)`n$details"
