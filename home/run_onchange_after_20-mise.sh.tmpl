@@ -1,0 +1,7 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+set -euo pipefail
+
+"$HOME/.local/bin/mise" install --yes
+{{- end }}
