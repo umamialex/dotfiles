@@ -21,6 +21,7 @@ packages:
     - CPUID.HWMonitor
     - Discord.Discord
     - Git.Git
+    - GitHub.cli
     - Google.Chrome
     - marlocarlo.psmux
     - Microsoft.PowerShell
