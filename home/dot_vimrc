@@ -12,7 +12,7 @@ Plugin 'fenetikm/falcon'
 Plugin 'chemzqm/vim-jsx-improve'
 Plugin 'HerringtonDarkholme/yats.vim'
 Plugin 'elzr/vim-json'
-Plugin 'w0rp/ale'
+Plugin 'dense-analysis/ale'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'flazz/vim-colorschemes'
 Plugin 'felixhummel/setcolors.vim'
@@ -58,7 +58,7 @@ let g:js_context_colors_block_scope = 1
 let g:js_context_colors_jsx = 1
 
 let g:ale_linter_aliases = {'jsx': ['css', 'javascript'], 'js': ['css', 'javascript'], 'ts': ['css', 'javascript']}
-let b:ale_linters = ['flake8', 'eslint', 'yamllint', 'stylelint']
+let g:ale_linters = ['flake8', 'eslint', 'yamllint', 'stylelint']
 
 au FileType java setl sw=4 sts=4 et
 
