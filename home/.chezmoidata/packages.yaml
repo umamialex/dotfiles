@@ -17,6 +17,7 @@ packages:
   winget:
     - 7zip.7zip
     - ajeetdsouza.zoxide
+    - FiloSottile.age
     - astral-sh.ruff
     - AutoHotkey.AutoHotkey
     - beeradmoore.dlss-swapper
