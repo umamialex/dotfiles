@@ -16,9 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CHEZMOI_VERSION: 2.73.3
-  CHEZMOI_LINUX_SHA256: 6e5827598cbfc02d132b04f95b5ea10efb5b79230e2a4a0e52df4af144a8ee9f
-  CHEZMOI_WINDOWS_SHA256: e74f9948a9ac6a5d8b0c0896a9ea129a766d92e38b50b70ee1fa1dc077755d6e
   ACTIONLINT_VERSION: 1.7.12
   ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
   TRUFFLEHOG_VERSION: 3.99.7
@@ -70,9 +67,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install chezmoi
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
-          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          # the latest release, checked against the checksums file published with it
+          version="$(gh release view --repo twpayne/chezmoi --json tagName --jq .tagName)"
+          base="https://github.com/twpayne/chezmoi/releases/download/${version}"
+          archive="chezmoi_${version#v}_linux_amd64.tar.gz"
+          curl -fsSL -o chezmoi.tar.gz "${base}/${archive}"
+          curl -fsSL -o checksums.txt "${base}/chezmoi_${version#v}_checksums.txt"
+          grep " ${archive}\$" checksums.txt | awk '{ print $1 "  chezmoi.tar.gz" }' | sha256sum -c -
           mkdir -p "$HOME/.local/bin"
           tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -88,15 +92,27 @@ jobs:
 
       - name: Render templates
         run: |
-          mkdir rendered
+          mkdir rendered rendered-laptop
           cd home
+          # gated scripts render empty without data, so render them with the flags turned on.
+          # CI is unset so the scripts that skip CI render too.
+          flags='"dev":true,"work":false,"server":true,"laptop":false,"gpu":"nvidia","nas_host":"nas.invalid"'
+          laptop_flags='"dev":true,"work":false,"server":true,"laptop":true,"gpu":"nvidia","nas_host":"nas.invalid"'
           for f in run_*.sh.tmpl; do
-            chezmoi --source "$GITHUB_WORKSPACE" execute-template < "$f" > "../rendered/${f%.tmpl}"
+            env -u CI chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{$flags}" < "$f" > "../rendered/${f%.tmpl}"
           done
           for f in run_*.ps1.tmpl; do
-            chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data '{"chezmoi":{"os":"windows"}}' < "$f" > "../rendered/${f%.tmpl}"
+            env -u CI chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{\"chezmoi\":{\"os\":\"windows\"},$flags}" < "$f" > "../rendered/${f%.tmpl}"
+            env -u CI chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{\"chezmoi\":{\"os\":\"windows\"},$laptop_flags}" < "$f" > "../rendered-laptop/${f%.tmpl}"
           done
           chezmoi --source "$GITHUB_WORKSPACE" execute-template < .chezmoiexternal.toml.tmpl > ../rendered/chezmoiexternal.toml
+
+      - name: Check the Windows Terminal seed is valid JSON
+        run: |
+          seed=home/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/create_settings.json.tmpl
+          for dev in true false; do
+            chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{\"dev\":$dev}" < "$seed" | python3 -m json.tool > /dev/null
+          done
 
       - name: Check shell scripts
         run: |
@@ -111,7 +127,7 @@ jobs:
       - name: Check PowerShell scripts
         shell: pwsh
         run: |
-          foreach ($file in Get-ChildItem rendered, scripts, home/dot_config/powershell -Filter *.ps1) {
+          foreach ($file in Get-ChildItem rendered, rendered-laptop, scripts, home/dot_config/powershell -Filter *.ps1) {
             $errors = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors)
             if ($errors.Count -gt 0) {
@@ -150,9 +166,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install chezmoi
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
-          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          # the latest release, checked against the checksums file published with it
+          version="$(gh release view --repo twpayne/chezmoi --json tagName --jq .tagName)"
+          base="https://github.com/twpayne/chezmoi/releases/download/${version}"
+          archive="chezmoi_${version#v}_linux_amd64.tar.gz"
+          curl -fsSL -o chezmoi.tar.gz "${base}/${archive}"
+          curl -fsSL -o checksums.txt "${base}/chezmoi_${version#v}_checksums.txt"
+          grep " ${archive}\$" checksums.txt | awk '{ print $1 "  chezmoi.tar.gz" }' | sha256sum -c -
           mkdir -p "$HOME/.local/bin"
           tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -168,12 +191,13 @@ jobs:
                      "ag --version" "htop --version" "mise --version" "node -v" "go version" \
                      "kubectl version --client" "helm version --short" "gh --version" "fzf --version" \
                      "fd --version" "bat --version" "eza --version" "zoxide --version" "fisher --version" \
+                     "terraform version" "tofu version" "k6 version" "jq --version" \
                      "type -q tide" "functions -q fzf_configure_bindings" "functions -q z"; do
             echo "+ $cmd"
             fish -ic "$cmd" < /dev/null > /dev/null
           done
           # GitHub's runners ship some of these tools, so check they come from mise
-          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff; do
+          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff terraform tofu k6 jq; do
             fish -ic "type -p $tool" < /dev/null | grep -q mise || { echo "$tool does not come from mise"; exit 1; }
           done
           fish -ic 'functions ls | string match -q "*eza*"' < /dev/null
@@ -214,9 +238,18 @@ jobs:
 
       - name: Install chezmoi
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          Invoke-WebRequest -Uri "https://github.com/twpayne/chezmoi/releases/download/v$env:CHEZMOI_VERSION/chezmoi_${env:CHEZMOI_VERSION}_windows_amd64.zip" -OutFile chezmoi.zip
-          if ((Get-FileHash chezmoi.zip -Algorithm SHA256).Hash.ToLower() -ne $env:CHEZMOI_WINDOWS_SHA256) { throw 'chezmoi checksum mismatch' }
+          # the latest release, checked against the checksums file published with it
+          $version = gh release view --repo twpayne/chezmoi --json tagName --jq .tagName
+          $bare = $version.TrimStart('v')
+          $archive = "chezmoi_${bare}_windows_amd64.zip"
+          $base = "https://github.com/twpayne/chezmoi/releases/download/$version"
+          Invoke-WebRequest -Uri "$base/$archive" -OutFile chezmoi.zip
+          Invoke-WebRequest -Uri "$base/chezmoi_${bare}_checksums.txt" -OutFile checksums.txt
+          $expected = ((Select-String -Path checksums.txt -Pattern "$([regex]::Escape($archive))$").Line -split '\s+')[0]
+          if ((Get-FileHash chezmoi.zip -Algorithm SHA256).Hash.ToLower() -ne $expected) { throw 'chezmoi checksum mismatch' }
           Expand-Archive chezmoi.zip -DestinationPath "$env:RUNNER_TEMP\chezmoi"
           "$env:RUNNER_TEMP\chezmoi" | Out-File -FilePath $env:GITHUB_PATH -Append
 
