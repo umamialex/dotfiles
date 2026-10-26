@@ -14,7 +14,7 @@ set -g default-terminal "screen-256color"
 set -s escape-time 10
 set -sg repeat-time 600
 set -s focus-events on
-set -g history-limit 10000
+set -g history-limit 50000
 set -g set-titles on
 set -g status-position top
 set -g status-interval 1
@@ -30,7 +30,7 @@ set -g status-right '#H << %H:%M:%S %y-%m-%d %A'
 set -g status-right '#{prefix_highlight} C:#{continuum_status} #H << %H:%M:%S %y-%m-%d %A'
 set -g @continuum-boot 'on'
 set -g @continuum-restore 'on'
-set -g @continuum-save-interval '0'
+set -g @continuum-save-interval '15'
 
 run '~/.tmux/plugins/tpm/tpm'
 {{ end -}}
