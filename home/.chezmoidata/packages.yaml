@@ -31,7 +31,6 @@ packages:
     - Microsoft.PowerShell
     - Microsoft.PowerToys
     - Microsoft.WindowsTerminal
-    - MultiViewer.MultiViewer
     - NirSoft.SoundVolumeView
     - Notepad++.Notepad++
     - Python.Python.3.13
