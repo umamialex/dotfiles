@@ -1,32 +1,39 @@
 {{- if eq .chezmoi.os "windows" -}}
 {{- $ids := .packages.winget -}}
+{{- $store := list -}}
 {{- if ne (env "CI") "true" -}}
 {{-   $ids = concat $ids .packages.winget_desktop -}}
+{{-   $store = .packages.winget_store -}}
 {{-   if and (hasKey . "server") .server -}}
 {{-     $ids = concat $ids .packages.winget_server -}}
 {{-   end -}}
 {{- end -}}
-# winget packages hash: {{ $ids | toJson | sha256sum }}
+# winget packages hash: {{ concat $ids $store | toJson | sha256sum }}
 $ErrorActionPreference = 'Stop'
 
-$ids = @('{{ $ids | join "','" }}')
+$ids = @('{{ $ids | join "','" }}') | Where-Object { $_ }
+$storeIds = @('{{ $store | join "','" }}') | Where-Object { $_ }
 
 # keep going after a failed install, so one bad installer doesn't skip the rest
 $failed = @()
-foreach ($id in $ids) {
-  winget list --id $id --exact --source winget --accept-source-agreements | Out-Null
+
+function Install-App($id, $source) {
+  winget list --id $id --exact --source $source --accept-source-agreements | Out-Null
   if ($LASTEXITCODE -eq 0) {
     Write-Host "$id already installed"
-    continue
+    return
   }
 
   Write-Host "Installing $id"
-  winget install --id $id --exact --source winget --silent --accept-package-agreements --accept-source-agreements
+  winget install --id $id --exact --source $source --silent --accept-package-agreements --accept-source-agreements
   if ($LASTEXITCODE -ne 0) {
     Write-Warning "winget install failed for $id (exit code $LASTEXITCODE)"
-    $failed += $id
+    $script:failed += $id
   }
 }
+
+foreach ($id in $ids) { Install-App $id 'winget' }
+foreach ($id in $storeIds) { Install-App $id 'msstore' }
 
 if ($failed.Count -gt 0) {
   throw "winget install failed for: $($failed -join ', ')"

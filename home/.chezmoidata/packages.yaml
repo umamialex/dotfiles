@@ -34,7 +34,6 @@ packages:
     - REALiX.HWiNFO
     - Resplendence.WhoCrashed
     - SlackTechnologies.Slack
-    - Spotify.Spotify
     - TechPowerUp.GPU-Z
     - Valve.Steam
     - VideoLAN.VLC
@@ -45,6 +44,10 @@ packages:
     - Garmin.Express
     - Parsec.Parsec
     - ViGEm.ViGEmBus
+  # Microsoft Store apps, installed with --source msstore and skipped in CI.
+  # The winget-source Spotify installer refuses to run from an elevated session.
+  winget_store:
+    - 9NCBCSZSJRSB # Spotify
   # only on the home server (answer "yes" to the Home server prompt), skipped in CI
   winget_server:
     - LianLi.LConnect3
