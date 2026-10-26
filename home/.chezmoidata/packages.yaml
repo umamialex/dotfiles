@@ -15,9 +15,12 @@ packages:
     - vim
   winget:
     - 7zip.7zip
+    - CPUID.HWMonitor
     - Discord.Discord
     - Google.Chrome
+    - SlackTechnologies.Slack
     - Spotify.Spotify
+    - TechPowerUp.GPU-Z
     - Valve.Steam
     - VideoLAN.VLC
     - Zoom.Zoom
