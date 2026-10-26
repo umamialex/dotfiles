@@ -16,13 +16,16 @@ packages:
   # installed on every Windows machine, including CI
   winget:
     - 7zip.7zip
+    - ajeetdsouza.zoxide
     - AutoHotkey.AutoHotkey
     - beeradmoore.dlss-swapper
     - CPUID.HWMonitor
     - Discord.Discord
+    - eza-community.eza
     - Git.Git
     - GitHub.cli
     - Google.Chrome
+    - junegunn.fzf
     - marlocarlo.psmux
     - Microsoft.PowerShell
     - Microsoft.PowerToys
@@ -32,12 +35,18 @@ packages:
     - Notepad++.Notepad++
     - Python.Python.3.13
     - REALiX.HWiNFO
+    - sharkdp.bat
+    - sharkdp.fd
     - Resplendence.WhoCrashed
+    - Starship.Starship
     - SlackTechnologies.Slack
     - TechPowerUp.GPU-Z
     - Valve.Steam
     - VideoLAN.VLC
     - Zoom.Zoom
+  # modules installed from the PowerShell Gallery, pinned to an exact version
+  powershell_modules:
+    PSFzf: 2.7.12
   # drivers, services and large installers, skipped in CI
   winget_desktop:
     - Adobe.CreativeCloud
