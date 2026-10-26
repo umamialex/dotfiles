@@ -18,6 +18,7 @@ packages:
     - CPUID.HWMonitor
     - Discord.Discord
     - Google.Chrome
+    - Microsoft.PowerShell
     - SlackTechnologies.Slack
     - Spotify.Spotify
     - TechPowerUp.GPU-Z
