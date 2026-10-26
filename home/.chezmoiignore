@@ -6,6 +6,9 @@ _vimrc
 vimfiles
 AppData
 {{ end }}
+{{ if and (eq .chezmoi.os "windows") (not (and (hasKey . "server") .server)) }}
+Scripts/AutoHotkey
+{{ end }}
 {{ if eq .chezmoi.os "windows" }}
 .config/fish
 .config/mise

@@ -1,4 +1,6 @@
-{{- if eq .chezmoi.os "windows" -}}
+{{- $laptop := and (hasKey . "laptop") .laptop -}}
+{{- if and (eq .chezmoi.os "windows") (not $laptop) -}}
 #Requires -RunAsAdministrator
+# Laptops keep hibernation, see run_onchange_after_31-hibernate-after.ps1.tmpl
 powercfg -h off
 {{- end }}

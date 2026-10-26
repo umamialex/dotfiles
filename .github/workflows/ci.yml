@@ -278,9 +278,11 @@ jobs:
           & $vim -es -N -u (Join-Path $HOME '_vimrc') -c "redir! > $vimOut" -c 'echo get(g:, "colors_name", "NONE")' -c 'echo string(map(ale#linter#Get("python"), "v:val.name"))' -c 'redir END' -c 'qa!'
           $vimResult = Get-Content $vimOut -Raw
           if ($vimResult -notmatch 'falcon' -or $vimResult -notmatch 'ruff') { throw "vim config did not load: $vimResult" }
-          foreach ($path in 'Scripts\Set-ChromeBorder.ps1', 'Scripts\AutoHotkey\multimedia-control.ahk') {
-            if (-not (Test-Path (Join-Path $HOME $path))) { throw "$path not applied" }
-          }
+          if (-not (Test-Path (Join-Path $HOME 'Scripts\Set-ChromeBorder.ps1'))) { throw 'Scripts\Set-ChromeBorder.ps1 not applied' }
+          # the AutoHotkey script is only for the home server
+          $isServer = [bool](chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).server
+          $ahkApplied = Test-Path (Join-Path $HOME 'Scripts\AutoHotkey\multimedia-control.ahk')
+          if ($ahkApplied -ne $isServer) { throw "AutoHotkey script applied is $ahkApplied but server is $isServer" }
           if (Select-String -Path (Join-Path $HOME '.tmux.conf') -Pattern 'tpm' -Quiet) { throw 'tpm should not be in the Windows tmux config' }
           # winget changes PATH after this job started, so reload it like a new terminal would
           $env:PATH = [Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('PATH', 'User')

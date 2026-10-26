@@ -1,0 +1,15 @@
+{{- $laptop := and (hasKey . "laptop") .laptop -}}
+{{- if and (eq .chezmoi.os "windows") $laptop -}}
+#Requires -RunAsAdministrator
+# hibernate after 30 minutes asleep on battery, never on AC. The lid action is left alone.
+$ErrorActionPreference = 'Stop'
+
+# the hibernate timeouts only exist once hibernation is on
+powercfg -h on
+if ($LASTEXITCODE -ne 0) { throw "powercfg -h on failed (exit code $LASTEXITCODE)" }
+powercfg /change hibernate-timeout-dc 30
+if ($LASTEXITCODE -ne 0) { throw "powercfg hibernate-timeout-dc failed (exit code $LASTEXITCODE)" }
+powercfg /change hibernate-timeout-ac 0
+if ($LASTEXITCODE -ne 0) { throw "powercfg hibernate-timeout-ac failed (exit code $LASTEXITCODE)" }
+Write-Host 'Hibernate after: 30 minutes on battery, never on AC'
+{{- end }}

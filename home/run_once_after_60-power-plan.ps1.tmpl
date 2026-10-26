@@ -1,4 +1,5 @@
-{{- if eq .chezmoi.os "windows" -}}
+{{- $laptop := and (hasKey . "laptop") .laptop -}}
+{{- if and (eq .chezmoi.os "windows") (not $laptop) -}}
 $ErrorActionPreference = 'Stop'
 
 $plans = powercfg /list | ForEach-Object {

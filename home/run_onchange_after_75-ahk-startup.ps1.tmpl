@@ -1,4 +1,5 @@
-{{- if eq .chezmoi.os "windows" -}}
+{{- $server := and (hasKey . "server") .server -}}
+{{- if and (eq .chezmoi.os "windows") $server -}}
 # multimedia-control.ahk hash: {{ include "Scripts/AutoHotkey/multimedia-control.ahk" | sha256sum }}
 $ErrorActionPreference = 'Stop'
 
