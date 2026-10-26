@@ -1,0 +1,13 @@
+{{- if eq .chezmoi.os "windows" -}}
+$ErrorActionPreference = 'Stop'
+
+# Documents may be redirected to OneDrive, so ask PowerShell where it reads its profile from
+$profilePath = $PROFILE.CurrentUserCurrentHost
+$stub = '. "$HOME\.config\powershell\profile.ps1"'
+
+New-Item -ItemType Directory -Path (Split-Path $profilePath) -Force | Out-Null
+$current = if (Test-Path $profilePath) { Get-Content $profilePath -Raw } else { '' }
+if (-not ([string]$current).Contains($stub)) {
+  Add-Content -Path $profilePath -Value "`n# managed by chezmoi: loads the shared profile`n$stub`n"
+}
+{{- end }}

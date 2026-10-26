@@ -1,0 +1,10 @@
+{{- if eq .chezmoi.os "windows" -}}
+# powershell modules hash: {{ .packages.powershell_modules | toJson | sha256sum }}
+$ErrorActionPreference = 'Stop'
+
+{{ range $name, $version := .packages.powershell_modules -}}
+if (-not (Get-InstalledPSResource -Name '{{ $name }}' -Version '{{ $version }}' -ErrorAction SilentlyContinue)) {
+  Install-PSResource -Name '{{ $name }}' -Version '{{ $version }}' -Repository PSGallery -TrustRepository -Scope CurrentUser
+}
+{{ end -}}
+{{- end }}
