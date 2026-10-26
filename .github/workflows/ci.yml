@@ -21,6 +21,8 @@ env:
   CHEZMOI_WINDOWS_SHA256: e74f9948a9ac6a5d8b0c0896a9ea129a766d92e38b50b70ee1fa1dc077755d6e
   ACTIONLINT_VERSION: 1.7.12
   ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+  TRUFFLEHOG_VERSION: 3.99.7
+  TRUFFLEHOG_SHA256: bdbea0508e439b144f49de14e775908de5f902f3d14ea7ae8354bae72b0b72ef
 
 jobs:
   lint:
@@ -80,6 +82,26 @@ jobs:
             }
             Write-Host "OK $($file.Name)"
           }
+
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install trufflehog
+        run: |
+          curl -fsSL -o trufflehog.tar.gz "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_amd64.tar.gz"
+          echo "${TRUFFLEHOG_SHA256}  trufflehog.tar.gz" | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf trufflehog.tar.gz -C "$HOME/.local/bin" trufflehog
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Scan history for secrets
+        run: trufflehog git "file://$GITHUB_WORKSPACE" --no-update --results=verified,unknown --fail
 
   linux:
     runs-on: ubuntu-24.04
