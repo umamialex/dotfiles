@@ -29,7 +29,10 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     ```
     > chezmoi init --apply umamialex
     ```
-    * Installs apps with winget (see `packages.winget` in `home/.chezmoidata/packages.yaml`)
+    * `chezmoi init` asks for your name, email, and whether this is the home server
+    * Installs apps with winget from `home/.chezmoidata/packages.yaml`: `winget` on every machine,
+      `winget_desktop` (drivers, services, large installers) everywhere except CI, and `winget_server`
+      (L-Connect 3, NZXT CAM, Sunshine) only if you answer yes to the home server prompt
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
     * Disables hibernation and sets the high performance power plan
     * Disables Multiplane Overlay on NVIDIA GPUs (fixes Chrome freezing with several video streams, needs a restart)
@@ -83,7 +86,7 @@ and `run_once_*` scripts run once per machine.
 | Path | Purpose |
 |---|---|
 | `home/` | chezmoi source directory (`.chezmoiroot`) |
-| `home/.chezmoidata/packages.yaml` | apt packages, winget apps, and Appx packages to remove |
+| `home/.chezmoidata/packages.yaml` | apt packages, winget apps (core, desktop, server), startup entries to disable, and Appx packages to remove |
 | `home/.chezmoiexternal.toml.tmpl` | pinned mise binary, Vundle, and tpm |
 | `home/run_*` | install scripts for Linux (`.sh`) and Windows (`.ps1`) |
 | `home/Scripts/` | Windows-only scripts: Chrome border watcher and AutoHotkey hotkeys |
@@ -99,5 +102,5 @@ and `run_once_*` scripts run once per machine.
 * **chezmoi in CI:** pinned by version and sha256 in `.github/workflows/ci.yml`.
 * **Actions:** pinned by commit SHA, updated weekly by Dependabot.
 
-CI applies the dotfiles on clean Ubuntu and Windows runners, runs a smoke test, and checks
-that a second apply changes nothing. It also runs weekly to catch upstream breakage.
+CI applies the dotfiles on clean Ubuntu and Windows runners (skipping the desktop and server
+winget lists), runs a smoke test, and checks that a second apply changes nothing. It also runs weekly to catch upstream breakage.
