@@ -13,3 +13,38 @@ packages:
     - tmux
     - unzip
     - vim
+  winget:
+    - 7zip.7zip
+    - Discord.Discord
+    - Google.Chrome
+    - Spotify.Spotify
+    - Valve.Steam
+    - VideoLAN.VLC
+    - Zoom.Zoom
+  appx_remove:
+    - Microsoft.XboxApp # Xbox
+    - Microsoft.XboxGameOverlay # Xbox Game Bar
+    - Microsoft.XboxGamingOverlay # Xbox Gaming Overlay
+    - Microsoft.XboxIdentityProvider # Xbox Identity Provider
+    - Microsoft.XboxSpeechToTextOverlay # Xbox Speech to Text Overlay
+    - Microsoft.YourPhone # Your Phone
+    - Microsoft.WindowsMaps # Maps
+    - Microsoft.GetHelp # Get Help
+    - Microsoft.People # People
+    - Microsoft.3DBuilder # 3D Builder
+    - Microsoft.BingWeather # Bing Weather
+    - Microsoft.Getstarted # Tips
+    - Microsoft.Messaging # Messaging
+    - Microsoft.Microsoft3DViewer # Mixed Reality Viewer
+    - Microsoft.MixedReality.Portal # Mixed Reality Portal
+    - Microsoft.MicrosoftOfficeHub # My Office
+    - Microsoft.MicrosoftStickyNotes # Sticky Notes
+    - Microsoft.Office.OneNote # OneNote
+    - Microsoft.OneConnect # Paid Wi-Fi & Cellular
+    - Microsoft.Outlook.DesktopIntegrationServices # Outlook
+    - Microsoft.SkypeApp # Skype
+    - Microsoft.Wallet # Microsoft Pay
+    - Microsoft.windowscommunicationsapps # Mail & Calendar
+    - Microsoft.WindowsFeedbackHub # Feedback Hub
+    - Microsoft.ZuneMusic # Groove Music
+    - Microsoft.ZuneVideo # Movies & TV
