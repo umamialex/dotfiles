@@ -4,5 +4,5 @@
 
 log "Installing global pip packages:" && \
 
-pip install \
+pipx install \
   huggingface_hub
