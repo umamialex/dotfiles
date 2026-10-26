@@ -187,6 +187,17 @@ jobs:
           grep -q falcon "$vim_out"
           grep -q "'ruff'" "$vim_out"
           test -d "$HOME/.tmux/plugins/tmux-sensible"
+          # the pre-commit hook is wired up, and blocks a commit when trufflehog is missing
+          test -x "$HOME/.config/git/hooks/pre-commit"
+          test "$(git config --global core.hooksPath)" = "~/.config/git/hooks"
+          repo="$(mktemp -d)"
+          git -C "$repo" init -q
+          echo test > "$repo/file"
+          git -C "$repo" add file
+          if PATH=/usr/bin:/bin git -C "$repo" -c user.name=ci -c user.email=ci@example.com commit -q -m test; then
+            echo "the pre-commit hook should block a commit when trufflehog is missing"
+            exit 1
+          fi
 
       - name: Check idempotency
         run: |
