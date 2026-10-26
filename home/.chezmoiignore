@@ -4,6 +4,7 @@ Scripts
 .config/starship.toml
 _vimrc
 vimfiles
+AppData
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
 .config/fish
