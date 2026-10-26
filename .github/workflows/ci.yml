@@ -194,6 +194,7 @@ jobs:
           if ((Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR').AppCaptureEnabled -ne 0) { throw 'Game Bar capture still enabled' }
           if ((Get-ItemProperty 'HKCU:\System\GameConfigStore').GameDVR_Enabled -ne 0) { throw 'GameDVR still enabled' }
           if ((Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Power').HibernateEnabled -ne 0) { throw 'Hibernation still enabled' }
+          if ((Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive').DisableFileSyncNGSC -ne 1) { throw 'OneDrive policy not set' }
           powercfg /getactivescheme
           wsl --status
           if ((git config --global user.email) -ne 'ci@example.com') { throw 'gitconfig not rendered' }
