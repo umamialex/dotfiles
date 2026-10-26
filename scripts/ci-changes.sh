@@ -13,7 +13,7 @@ untested='^(README\.md|LICENSE|\.gitignore|backups/|windows/)'
 # the audit scripts are only linted, never run, so only the lint job cares
 audit='^scripts/audit-'
 # files only the Windows apply uses
-windows_only='^(home/.*\.ps1\.tmpl|home/Scripts/|home/_vimrc\.tmpl|home/dot_config/powershell/|home/dot_config/starship\.toml|fonts/)'
+windows_only='^(home/.*\.ps1\.tmpl|home/Scripts/|home/AppData/|home/_vimrc\.tmpl|home/dot_config/powershell/|home/dot_config/starship\.toml|fonts/)'
 # files only the Linux apply uses (the tmux template is shared: Windows renders it for psmux)
 linux_only='^(home/.*\.sh\.tmpl|home/dot_config/fish/|home/dot_config/mise/|home/dot_vimrc\.tmpl)'
 

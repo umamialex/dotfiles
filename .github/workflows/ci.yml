@@ -249,6 +249,14 @@ jobs:
           }
           if (-not (Test-Path (Join-Path $HOME '.tmux.conf'))) { throw '.tmux.conf not applied' }
           if (-not (Test-Path (Join-Path $HOME '_vimrc'))) { throw '_vimrc not applied' }
+          # app settings are seeded only if the app hasn't created its own yet
+          $multiviewer = Get-Content "$env:APPDATA\MultiViewer\config.json" -Raw | ConvertFrom-Json
+          if ($null -ne $multiviewer.installId) { throw 'MultiViewer config should not carry an installId' }
+          $zones = (Get-Content "$env:LOCALAPPDATA\Microsoft\PowerToys\FancyZones\custom-layouts.json" -Raw | ConvertFrom-Json).'custom-layouts'
+          if ($zones.Count -ne 7) { throw "expected 7 FancyZones layouts, found $($zones.Count)" }
+          foreach ($file in 'default-layouts', 'layout-hotkeys', 'layout-templates', 'settings') {
+            Get-Content "$env:LOCALAPPDATA\Microsoft\PowerToys\FancyZones\$file.json" -Raw | ConvertFrom-Json | Out-Null
+          }
           foreach ($plugin in 'vim-fugitive', 'ale', 'falcon', 'vim-styled-components', 'vim-jsonnet') {
             if (-not (Test-Path (Join-Path $HOME "vimfiles\pack\plugins\start\$plugin"))) { throw "vim plugin $plugin not installed" }
           }
