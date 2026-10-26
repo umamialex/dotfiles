@@ -13,26 +13,21 @@ packages:
     - tmux
     - unzip
     - vim
+  # installed on every Windows machine, including CI
   winget:
     - 7zip.7zip
-    - Adobe.CreativeCloud
     - AutoHotkey.AutoHotkey
     - beeradmoore.dlss-swapper
     - CPUID.HWMonitor
     - Discord.Discord
-    - Garmin.Express
     - Git.Git
     - Google.Chrome
-    - LianLi.LConnect3
-    - LizardByte.Sunshine
     - marlocarlo.psmux
     - Microsoft.PowerShell
     - Microsoft.PowerToys
     - Microsoft.WindowsTerminal
     - MultiViewer.MultiViewer
     - Notepad++.Notepad++
-    - NZXT.CAM
-    - Parsec.Parsec
     - Python.Python.3.13
     - REALiX.HWiNFO
     - Resplendence.WhoCrashed
@@ -41,8 +36,18 @@ packages:
     - TechPowerUp.GPU-Z
     - Valve.Steam
     - VideoLAN.VLC
-    - ViGEm.ViGEmBus
     - Zoom.Zoom
+  # drivers, services and large installers, skipped in CI
+  winget_desktop:
+    - Adobe.CreativeCloud
+    - Garmin.Express
+    - Parsec.Parsec
+    - ViGEm.ViGEmBus
+  # only on the home server (answer "yes" to the Home server prompt), skipped in CI
+  winget_server:
+    - LianLi.LConnect3
+    - LizardByte.Sunshine
+    - NZXT.CAM
   startup_disable:
     run: # HKCU Run entries, * matches the per-machine suffix
       - GarminExpress
