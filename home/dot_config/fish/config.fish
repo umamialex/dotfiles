@@ -14,11 +14,22 @@ if status is-interactive
   abbr -a grafana 'cd ~/Development/grafana'
   abbr -a e 'explorer.exe .'
 
-  alias ls='ls -laX --color=auto'
   alias fw='powershell.exe ~/Development/personal/dotfiles/windows/wsl-firewall.ps1'
   alias s='fw && sudo service ssh start'
 
   if type -q mise
     mise activate fish | source
+  end
+
+  # smart cd: `z grafana` jumps to the most used matching directory
+  if type -q zoxide
+    zoxide init fish | source
+  end
+
+  # long listing sorted by extension, like `ls -laX`
+  if type -q eza
+    alias ls='eza -la --sort=extension --git'
+  else
+    alias ls='ls -laX --color=auto'
   end
 end
