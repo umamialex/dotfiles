@@ -2,13 +2,18 @@
 # vim plugins hash: {{ .vim_plugins | toJson | sha256sum }}
 $ErrorActionPreference = 'Stop'
 
-# winget changes PATH after this session started, so fall back to where the installer puts vim
-$vim = (Get-Command vim -ErrorAction SilentlyContinue).Source
-if (-not $vim) {
-  $vim = Get-ChildItem "${env:ProgramFiles(x86)}\Vim", "$env:ProgramFiles\Vim" -Filter vim.exe -Recurse -ErrorAction SilentlyContinue |
-    Select-Object -First 1 -ExpandProperty FullName
+# Vim's installer records the path of gvim.exe under HKCU (per-user install) or HKLM (all users).
+# PATH is no use here: winget changes it after this session started, and adding to it is optional.
+$vim = $null
+foreach ($key in 'HKCU:\Software\Vim\Gvim', 'HKLM:\Software\Vim\Gvim', 'HKLM:\Software\WOW6432Node\Vim\Gvim') {
+  $gvim = (Get-ItemProperty $key -ErrorAction SilentlyContinue).path
+  if ($gvim -and (Test-Path (Join-Path (Split-Path $gvim) 'vim.exe'))) {
+    $vim = Join-Path (Split-Path $gvim) 'vim.exe'
+    break
+  }
 }
-if (-not $vim) { throw 'vim.exe not found' }
+if (-not $vim) { $vim = (Get-Command vim -ErrorAction SilentlyContinue).Source }
+if (-not $vim) { throw 'vim.exe not found: the Vim installer did not register itself' }
 
 # generate help tags for the plugins chezmoi installed as native packages
 & $vim -es -u NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
