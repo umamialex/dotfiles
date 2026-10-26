@@ -32,6 +32,10 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Installs apps with winget (see `packages.winget` in `home/.chezmoidata/packages.yaml`)
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
     * Disables hibernation and sets the high performance power plan
+    * Disables Multiplane Overlay on NVIDIA GPUs (fixes Chrome freezing with several video streams, needs a restart)
+    * Keeps Chrome windows on black, square borders with a logon task (`~/Scripts/Set-ChromeBorder.ps1`)
+    * Installs AutoHotkey v2 and starts `~/Scripts/AutoHotkey/multimedia-control.ahk` at sign-in
+    * Disables the startup entries listed in `packages.startup_disable` that exist on the machine
     * Installs WSL 2, Ubuntu, and the `Source Code Pro` font
     * `.ps1` scripts run with `pwsh -ExecutionPolicy Bypass`, so no execution policy change is needed
 1. Update all motherboard drivers
@@ -43,6 +47,11 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Disable `Reward is available` desktop notification
     * Enable `Automatically download driver updates...`
 1. Update monitor refresh rate
+1. Launch Chrome with `--disable-features=UseEcoQoSForBackgroundProcess,CalculateNativeWinOcclusion`
+    (add it to the shortcut target as a single comma-separated flag) and turn off
+    `Continue running background apps when Google Chrome is closed`
+1. Install [SoundVolumeView](https://www.nirsoft.net/utils/sound_volume_view.html) to `C:\Tools\SoundVolumeView`
+    (used by the audio hotkeys in `multimedia-control.ahk`)
 1. Set the Windows Terminal font to `Source Code Pro` and set to medium weight
 1. Disable extraneous audio devices
 
@@ -77,6 +86,7 @@ and `run_once_*` scripts run once per machine.
 | `home/.chezmoidata/packages.yaml` | apt packages, winget apps, and Appx packages to remove |
 | `home/.chezmoiexternal.toml.tmpl` | pinned mise binary, Vundle, and tpm |
 | `home/run_*` | install scripts for Linux (`.sh`) and Windows (`.ps1`) |
+| `home/Scripts/` | Windows-only scripts: Chrome border watcher and AutoHotkey hotkeys |
 | `home/dot_config/mise/config.toml` | global tool versions |
 | `windows/wsl-firewall.ps1` | forwards WSL ports, used by the `fw` alias |
 | `fonts/` | `Source Code Pro`, installed by the Windows scripts |
