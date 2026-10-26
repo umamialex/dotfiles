@@ -1,9 +1,18 @@
 {{- if eq .chezmoi.os "windows" -}}
-# winget packages hash: {{ .packages.winget | toJson | sha256sum }}
+{{- $ids := .packages.winget -}}
+{{- if ne (env "CI") "true" -}}
+{{-   $ids = concat $ids .packages.winget_desktop -}}
+{{-   if and (hasKey . "server") .server -}}
+{{-     $ids = concat $ids .packages.winget_server -}}
+{{-   end -}}
+{{- end -}}
+# winget packages hash: {{ $ids | toJson | sha256sum }}
 $ErrorActionPreference = 'Stop'
 
-$ids = @('{{ .packages.winget | join "','" }}')
+$ids = @('{{ $ids | join "','" }}')
 
+# keep going after a failed install, so one bad installer doesn't skip the rest
+$failed = @()
 foreach ($id in $ids) {
   winget list --id $id --exact --source winget --accept-source-agreements | Out-Null
   if ($LASTEXITCODE -eq 0) {
@@ -14,7 +23,12 @@ foreach ($id in $ids) {
   Write-Host "Installing $id"
   winget install --id $id --exact --source winget --silent --accept-package-agreements --accept-source-agreements
   if ($LASTEXITCODE -ne 0) {
-    throw "winget install failed for $id (exit code $LASTEXITCODE)"
+    Write-Warning "winget install failed for $id (exit code $LASTEXITCODE)"
+    $failed += $id
   }
+}
+
+if ($failed.Count -gt 0) {
+  throw "winget install failed for: $($failed -join ', ')"
 }
 {{- end }}
