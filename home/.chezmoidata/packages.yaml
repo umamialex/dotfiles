@@ -15,17 +15,32 @@ packages:
     - vim
   winget:
     - 7zip.7zip
+    - Adobe.CreativeCloud
     - AutoHotkey.AutoHotkey
     - CPUID.HWMonitor
     - Discord.Discord
+    - Garmin.Express
+    - Git.Git
     - Google.Chrome
+    - LianLi.LConnect3
+    - LizardByte.Sunshine
     - marlocarlo.psmux
     - Microsoft.PowerShell
+    - Microsoft.PowerToys
+    - Microsoft.WindowsTerminal
+    - MultiViewer.MultiViewer
+    - Notepad++.Notepad++
+    - NZXT.CAM
+    - Parsec.Parsec
+    - Python.Python.3.13
+    - REALiX.HWiNFO
+    - Resplendence.WhoCrashed
     - SlackTechnologies.Slack
     - Spotify.Spotify
     - TechPowerUp.GPU-Z
     - Valve.Steam
     - VideoLAN.VLC
+    - ViGEm.ViGEmBus
     - Zoom.Zoom
   startup_disable:
     run: # HKCU Run entries, * matches the per-machine suffix
