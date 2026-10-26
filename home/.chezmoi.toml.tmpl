@@ -4,3 +4,9 @@
 [data]
   name = {{ $name | quote }}
   email = {{ $email | quote }}
+{{- if eq .chezmoi.os "windows" }}
+
+[interpreters.ps1]
+  command = "powershell"
+  args = ["-NoLogo", "-ExecutionPolicy", "Bypass", "-File"]
+{{- end }}
