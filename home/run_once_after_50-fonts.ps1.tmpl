@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "windows" -}}
+$ErrorActionPreference = 'Stop'
+
+$source = '{{ .chezmoi.workingTree }}/fonts/Source Code Pro'
+$fontDir = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Fonts'
+$registry = 'HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts'
+
+New-Item -ItemType Directory -Path $fontDir -Force | Out-Null
+New-Item -Path $registry -Force | Out-Null
+
+foreach ($font in Get-ChildItem -Path $source -Filter *.ttf) {
+  $target = Join-Path $fontDir $font.Name
+  Copy-Item -Path $font.FullName -Destination $target -Force
+  New-ItemProperty -Path $registry -Name "$($font.BaseName) (TrueType)" -Value $target -PropertyType String -Force | Out-Null
+}
+{{- end }}
