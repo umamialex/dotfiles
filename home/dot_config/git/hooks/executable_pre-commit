@@ -3,9 +3,18 @@
 # core.hooksPath points here. Skip it for one commit with git commit --no-verify.
 set -euo pipefail
 
-if ! command -v trufflehog > /dev/null 2>&1; then
+trufflehog_bin="$(command -v trufflehog 2> /dev/null || true)"
+# on Windows, ~/.local/bin isn't on the PATH Git's bash sees, and the dotfiles install it there
+case "$(uname -s)" in
+  MINGW* | MSYS*)
+    if [ -z "$trufflehog_bin" ] && [ -f "$HOME/.local/bin/trufflehog.exe" ]; then
+      trufflehog_bin="$HOME/.local/bin/trufflehog.exe"
+    fi
+    ;;
+esac
+if [ -z "$trufflehog_bin" ]; then
   echo "pre-commit: trufflehog is not installed, so the staged changes can't be scanned." >&2
-  echo "Install it with: mise install trufflehog. To commit without a scan: git commit --no-verify" >&2
+  echo "Install it by running chezmoi apply. To commit without a scan: git commit --no-verify" >&2
   exit 1
 fi
 
@@ -22,4 +31,4 @@ git diff --cached --name-only --diff-filter=ACMR -z | while IFS= read -r -d '' f
 done
 
 # same results CI fails on
-trufflehog filesystem "$tmp" --no-update --results=verified,unknown --fail
+"$trufflehog_bin" filesystem "$tmp" --no-update --results=verified,unknown --fail

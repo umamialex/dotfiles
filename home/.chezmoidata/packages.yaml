@@ -92,6 +92,11 @@ packages:
   # programs winget doesn't carry, matched by display name and uninstalled the same way
   programs_remove:
     - Lenovo Now
+  # trufflehog for Windows, downloaded from the official release and checked against this sha256
+  # (from trufflehog_<version>_checksums.txt). Keep the version in step with TRUFFLEHOG_VERSION in ci.yml.
+  trufflehog:
+    version: 3.99.7
+    windows_amd64_sha256: 16e85ace8d7724774559d418e1bd876ae410a684321c1c44a34c499b03703d9d
   # packages the audit scripts (scripts/audit-packages.*) skip when listing untracked packages, * matches any suffix
   audit_ignore:
     winget:

@@ -54,6 +54,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Sets the high performance power plan, except on laptops
     * Disables the OneDrive sync client with a policy, except on work machines, and moves Desktop, Documents and Pictures out of OneDrive. The files are copied and the OneDrive copies stay in place
     * Maps `G:` to `\\<NAS host>\Google Drive`, except on work machines. Enter the NAS credentials once in Windows Credential Manager
+    * Installs trufflehog from the official release, checked against a pinned sha256, for the pre-commit hook
     * Seeds MultiViewer preferences, FancyZones layouts, hotkeys and settings, and Windows Terminal settings, only when the app hasn't created its own files yet
     * Installs Vim from winget (9.2) with the same config as Linux (`~/_vimrc` and `~/vimfiles`)
     * Sets up the PowerShell 7 profile (`~/.config/powershell/profile.ps1`, loaded through a stub at your real `$PROFILE`):
@@ -175,9 +176,14 @@ and fails on verified or unverifiable secrets. To scan locally (mise installs `t
 > trufflehog git file://. --no-update --no-verification
 ```
 
-On Linux a pre-commit hook runs the same scanner on the staged changes before every commit, in every repo.
+A pre-commit hook runs the same scanner on the staged changes before every commit, in every repo, on Linux and Windows.
 It blocks the commit on verified or unverifiable findings, and when trufflehog isn't installed.
-Windows has no trufflehog install, so the hook isn't wired there.
+Skip it for one commit with `git commit --no-verify`.
+
+mise installs trufflehog on Linux. winget has no package, so on Windows a script downloads the official release
+and installs it to `~/.local/bin` only if its sha256 matches the pin in `packages.yaml`. To bump the pin, update the
+version there and in `ci.yml`, and take the new hash from the release's `trufflehog_<version>_checksums.txt`.
+CI fails if the two versions disagree.
 
 ## Maintenance
 

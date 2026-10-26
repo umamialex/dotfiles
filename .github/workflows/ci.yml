@@ -121,6 +121,14 @@ jobs:
             shellcheck "$f"
           done
 
+      - name: Check the trufflehog pins agree
+        run: |
+          pinned="$(chezmoi --source "$GITHUB_WORKSPACE" data --format json | jq -r .packages.trufflehog.version)"
+          if [ "$pinned" != "$TRUFFLEHOG_VERSION" ]; then
+            echo "packages.yaml pins trufflehog $pinned but ci.yml uses $TRUFFLEHOG_VERSION"
+            exit 1
+          fi
+
       - name: Check external config is valid TOML
         run: python3 -c "import tomllib; tomllib.load(open('rendered/chezmoiexternal.toml', 'rb'))"
 
@@ -341,6 +349,17 @@ jobs:
           # a fresh pwsh loads the real profile through the stub
           $loaded = pwsh -NoLogo -Command '(Get-Command ls).CommandType; (Get-Command dev).CommandType; [bool](Get-Command z); [bool](Get-Command prompt)'
           if (($loaded -join ' ') -ne 'Function Function True True') { throw "profile did not load: $($loaded -join ' ')" }
+          # the pinned trufflehog is installed, and the pre-commit hook runs under Git for Windows
+          $trufflehog = Join-Path $HOME '.local\bin\trufflehog.exe'
+          $pinned = (chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).packages.trufflehog.version
+          if ((& $trufflehog --version 2>&1 | Out-String) -notmatch [regex]::Escape($pinned)) { throw "trufflehog $pinned is not installed" }
+          if (-not (Test-Path (Join-Path $HOME '.config\git\hooks\pre-commit'))) { throw 'pre-commit hook not applied' }
+          $repo = Join-Path $env:RUNNER_TEMP 'hook-test'
+          git init -q $repo
+          'test' | Set-Content (Join-Path $repo 'file')
+          git -C $repo add file
+          git -C $repo -c user.name=ci -c user.email=ci@example.com commit -q -m test
+          if ($LASTEXITCODE -ne 0) { throw 'the pre-commit hook blocked a harmless commit' }
 
       - name: Check idempotency
         shell: pwsh
