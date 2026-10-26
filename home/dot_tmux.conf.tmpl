@@ -5,10 +5,11 @@ set -g @plugin 'tmux-plugins/tmux-resurrect'
 set -g @plugin 'tmux-plugins/tmux-continuum'
 set -g @plugin 'tmux-plugins/tmux-prefix-highlight'
 
-{{ end -}}
+set -g default-terminal "tmux-256color"
+set -as terminal-features ",xterm*:RGB"
+set -s extended-keys on
+{{ else -}}
 set -g default-terminal "screen-256color"
-{{ if ne .chezmoi.os "windows" -}}
-setw -g xterm-keys on
 {{ end -}}
 set -s escape-time 10
 set -sg repeat-time 600
