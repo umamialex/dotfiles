@@ -152,3 +152,8 @@ and fails on verified or unverifiable secrets. To scan locally (mise installs `t
 
 CI applies the dotfiles on clean Ubuntu and Windows runners (skipping the desktop and server
 winget lists), runs a smoke test, and checks that a second apply changes nothing. It also runs weekly to catch upstream breakage.
+
+A job only runs when the change could affect it (`scripts/ci-changes.sh`): a README or backup
+change runs only the secret scan, a fish change skips the Windows job, and a PowerShell change
+skips the Linux job. Anything the script doesn't recognise, and every scheduled or manual run,
+runs everything. A PR is compared with `main`, so each push re-runs whatever the PR as a whole touches.
