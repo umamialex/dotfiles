@@ -57,8 +57,23 @@ let g:js_context_colors_highlight_function_names = 1
 let g:js_context_colors_block_scope = 1
 let g:js_context_colors_jsx = 1
 
-let g:ale_linter_aliases = {'jsx': ['css', 'javascript'], 'js': ['css', 'javascript'], 'ts': ['css', 'javascript']}
-let g:ale_linters = ['flake8', 'eslint', 'yamllint', 'stylelint']
+" aliases use real filetype names, so stylelint also runs on styled-components in JS and TS files
+let g:ale_linter_aliases = {
+\   'javascript': ['css', 'javascript'],
+\   'javascriptreact': ['css', 'javascript'],
+\   'typescript': ['css', 'javascript'],
+\   'typescriptreact': ['css', 'javascript'],
+\ }
+" g:ale_linters is a dictionary keyed by the buffer's filetype (only b:ale_linters takes a list)
+let g:ale_linters = {
+\   'python': ['flake8'],
+\   'javascript': ['eslint', 'stylelint'],
+\   'javascriptreact': ['eslint', 'stylelint'],
+\   'typescript': ['eslint', 'stylelint'],
+\   'typescriptreact': ['eslint', 'stylelint'],
+\   'css': ['stylelint'],
+\   'yaml': ['yamllint'],
+\ }
 
 au FileType java setl sw=4 sts=4 et
 
