@@ -115,8 +115,8 @@ jobs:
 
       - name: Check idempotency
         run: |
-          chezmoi apply --verbose
-          chezmoi verify
+          chezmoi --source "$GITHUB_WORKSPACE" apply --verbose
+          chezmoi --source "$GITHUB_WORKSPACE" verify
 
   windows:
     runs-on: windows-latest
@@ -149,7 +149,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $packages = (chezmoi data --format json | ConvertFrom-Json).packages
+          $packages = (chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).packages
           foreach ($id in $packages.winget) {
             winget list --id $id --exact --source winget | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "$id is not installed" }
@@ -178,5 +178,5 @@ jobs:
       - name: Check idempotency
         shell: pwsh
         run: |
-          chezmoi apply --verbose
-          chezmoi verify
+          chezmoi --source "$env:GITHUB_WORKSPACE" apply --verbose
+          chezmoi --source "$env:GITHUB_WORKSPACE" verify
