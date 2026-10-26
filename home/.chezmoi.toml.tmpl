@@ -7,6 +7,6 @@
 {{- if eq .chezmoi.os "windows" }}
 
 [interpreters.ps1]
-  command = "powershell"
+  command = "pwsh"
   args = ["-NoLogo", "-ExecutionPolicy", "Bypass", "-File"]
 {{- end }}
