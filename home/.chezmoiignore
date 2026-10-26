@@ -2,7 +2,6 @@
 .config
 .local
 .tmux
-.tmux.conf
 .vim
 .vimrc
 {{ end }}

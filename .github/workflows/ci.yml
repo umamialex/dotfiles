@@ -160,9 +160,11 @@ jobs:
           powercfg /getactivescheme
           wsl --status
           if ((git config --global user.email) -ne 'ci@example.com') { throw 'gitconfig not rendered' }
-          foreach ($path in '.vimrc', '.tmux.conf', '.config') {
+          foreach ($path in '.vimrc', '.config') {
             if (Test-Path (Join-Path $HOME $path)) { throw "$path should be ignored on Windows" }
           }
+          if (-not (Test-Path (Join-Path $HOME '.tmux.conf'))) { throw '.tmux.conf not applied' }
+          if (Select-String -Path (Join-Path $HOME '.tmux.conf') -Pattern 'tpm' -Quiet) { throw 'tpm should not be in the Windows tmux config' }
 
       - name: Check idempotency
         shell: pwsh
