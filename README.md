@@ -91,8 +91,22 @@ and `run_once_*` scripts run once per machine.
 | `home/run_*` | install scripts for Linux (`.sh`) and Windows (`.ps1`) |
 | `home/Scripts/` | Windows-only scripts: Chrome border watcher and AutoHotkey hotkeys |
 | `home/dot_config/mise/config.toml` | global tool versions |
+| `scripts/audit-packages.*` | lists installed packages that aren't in `packages.yaml`, and the reverse (see below) |
 | `windows/wsl-firewall.ps1` | forwards WSL ports, used by the `fw` alias |
 | `fonts/` | `Source Code Pro`, installed by the Windows scripts |
+
+## Auditing packages
+
+chezmoi only knows the lists in `packages.yaml`, so these scripts compare them with what is installed:
+
+```
+> ./scripts/audit-packages.sh      # Ubuntu (WSL): manual apt packages
+> ./scripts/audit-packages.ps1     # Windows: winget packages
+```
+
+Each prints packages that are installed but not tracked, and tracked packages that are missing.
+Runtimes and system packages are skipped through `packages.audit_ignore`.
+`chezmoi unmanaged <dir>` does the same for files.
 
 ## Maintenance
 
