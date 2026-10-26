@@ -35,6 +35,8 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
       (L-Connect 3, NZXT CAM, Sunshine) only if you answer yes to the home server prompt
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
     * Disables hibernation and sets the high performance power plan
+    * Sets up the PowerShell 7 profile (`~/.config/powershell/profile.ps1`, loaded through a stub at your real `$PROFILE`):
+      history suggestions, `eza` for `ls`, `zoxide`, fzf key bindings (PSFzf), a starship prompt, and the `dev`, `p`, `g` shortcuts
     * Disables Multiplane Overlay on NVIDIA GPUs (fixes Chrome freezing with several video streams, needs a restart)
     * Keeps Chrome windows on black, square borders with a logon task (`~/Scripts/Set-ChromeBorder.ps1`)
     * Installs AutoHotkey v2 and starts `~/Scripts/AutoHotkey/multimedia-control.ahk` at sign-in
@@ -91,6 +93,7 @@ and `run_once_*` scripts run once per machine.
 | `home/run_*` | install scripts for Linux (`.sh`) and Windows (`.ps1`) |
 | `home/Scripts/` | Windows-only scripts: Chrome border watcher and AutoHotkey hotkeys |
 | `home/dot_config/mise/config.toml` | global tool versions |
+| `home/dot_config/powershell/profile.ps1` | shared PowerShell 7 profile, with a starship prompt config in `home/dot_config/starship.toml` |
 | `scripts/audit-packages.*` | lists installed packages that aren't in `packages.yaml`, and the reverse (see below) |
 | `windows/wsl-firewall.ps1` | forwards WSL ports, used by the `fw` alias |
 | `fonts/` | `Source Code Pro`, installed by the Windows scripts |
