@@ -149,7 +149,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          foreach ($id in @('7zip.7zip', 'CPUID.HWMonitor', 'Discord.Discord', 'Google.Chrome', 'SlackTechnologies.Slack', 'Spotify.Spotify', 'TechPowerUp.GPU-Z', 'Valve.Steam', 'VideoLAN.VLC', 'Zoom.Zoom')) {
+          foreach ($id in @('7zip.7zip', 'CPUID.HWMonitor', 'Discord.Discord', 'Google.Chrome', 'Microsoft.PowerShell', 'SlackTechnologies.Slack', 'Spotify.Spotify', 'TechPowerUp.GPU-Z', 'Valve.Steam', 'VideoLAN.VLC', 'Zoom.Zoom')) {
             winget list --id $id --exact --source winget | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "$id is not installed" }
           }
