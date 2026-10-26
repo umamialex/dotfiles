@@ -133,7 +133,7 @@ jobs:
             fish -ic "$cmd" < /dev/null > /dev/null
           done
           # GitHub's runners ship some of these tools, so check they come from mise
-          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide; do
+          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff; do
             fish -ic "type -p $tool" < /dev/null | grep -q mise || { echo "$tool does not come from mise"; exit 1; }
           done
           fish -ic 'functions ls | string match -q "*eza*"' < /dev/null
@@ -141,7 +141,11 @@ jobs:
           fish -ic 'abbr --query k; and abbr --query dev' < /dev/null
           fish -n "$HOME/.config/fish/config.fish"
           test "$(git config --global user.email)" = "ci@example.com"
-          test -d "$HOME/.vim/bundle/ale"
+          test -f "$HOME/.vim/pack/plugins/start/vim-fugitive/doc/tags"
+          vim_out="$(mktemp)"
+          vim -es -N -u "$HOME/.vimrc" -c "redir! > $vim_out" -c 'echo get(g:, "colors_name", "NONE")' -c 'echo string(map(ale#linter#Get("python"), "v:val.name"))' -c 'redir END' -c 'qa!'
+          grep -q falcon "$vim_out"
+          grep -q "'ruff'" "$vim_out"
           test -d "$HOME/.tmux/plugins/tmux-sensible"
 
       - name: Check idempotency
@@ -202,6 +206,16 @@ jobs:
             if (Test-Path (Join-Path $HOME $path)) { throw "$path should be ignored on Windows" }
           }
           if (-not (Test-Path (Join-Path $HOME '.tmux.conf'))) { throw '.tmux.conf not applied' }
+          if (-not (Test-Path (Join-Path $HOME '_vimrc'))) { throw '_vimrc not applied' }
+          foreach ($plugin in 'vim-fugitive', 'ale', 'falcon', 'vim-styled-components', 'vim-jsonnet') {
+            if (-not (Test-Path (Join-Path $HOME "vimfiles\pack\plugins\start\$plugin"))) { throw "vim plugin $plugin not installed" }
+          }
+          $vim = Get-ChildItem "${env:ProgramFiles(x86)}\Vim", "$env:ProgramFiles\Vim" -Filter vim.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $vim) { throw 'vim.exe not found' }
+          $vimOut = Join-Path $env:TEMP 'vim-check.txt'
+          & $vim -es -N -u (Join-Path $HOME '_vimrc') -c "redir! > $vimOut" -c 'echo get(g:, "colors_name", "NONE")' -c 'echo string(map(ale#linter#Get("python"), "v:val.name"))' -c 'redir END' -c 'qa!'
+          $vimResult = Get-Content $vimOut -Raw
+          if ($vimResult -notmatch 'falcon' -or $vimResult -notmatch 'ruff') { throw "vim config did not load: $vimResult" }
           foreach ($path in 'Scripts\Set-ChromeBorder.ps1', 'Scripts\AutoHotkey\multimedia-control.ahk') {
             if (-not (Test-Path (Join-Path $HOME $path))) { throw "$path not applied" }
           }
