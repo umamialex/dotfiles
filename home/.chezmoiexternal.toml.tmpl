@@ -8,6 +8,9 @@
   type = "archive"
   url = "https://github.com/{{ .repo }}/archive/{{ .commit }}.tar.gz"
   stripComponents = 1
+{{- if hasKey . "include" }}
+  include = [{{ range $i, $pattern := .include }}{{ if $i }}, {{ end }}{{ $pattern | quote }}{{ end }}]
+{{- end }}
 {{ end }}
 {{- if eq .chezmoi.os "linux" -}}
 {{- $version := "v2026.10.19" -}}

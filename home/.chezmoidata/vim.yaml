@@ -10,6 +10,12 @@ vim_plugins:
   - name: falcon
     repo: fenetikm/falcon
     commit: 276cd483c73f5389f0bd99b18e2452bd57b77bf6
+    # the repo is mostly theme exports for other tools, and three of those are symlinks, which
+    # Windows can't create without admin rights; Vim only needs these directories
+    include:
+      - "*/colors/**"
+      - "*/autoload/**"
+      - "*/plugin/**"
   - name: vim-styled-components
     repo: styled-components/vim-styled-components
     commit: 75e178916fc3e61385350933a23055927f5f60b7
