@@ -29,21 +29,38 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     ```
     > chezmoi init --apply umamialex
     ```
-    * `chezmoi init` asks for your name, email, and whether this is the home server
-    * Installs apps with winget from `home/.chezmoidata/packages.yaml`: `winget` on every machine,
-      `winget_desktop` (drivers, services, large installers) everywhere except CI, and `winget_server`
-      (L-Connect 3, NZXT CAM, Sunshine) only if you answer yes to the home server prompt
-    * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
-    * Disables hibernation and sets the high performance power plan
-    * Disables the OneDrive sync client with a policy
-    * Seeds MultiViewer preferences, FancyZones layouts, hotkeys and settings, and Windows Terminal keybindings, only when the app hasn't created its own files yet
+    * `chezmoi init` asks these questions and remembers the answers
+        * Name and email
+        * Dev machine: dev tools, and Ubuntu as the Windows Terminal default
+        * Home server: server-only apps and the AutoHotkey media keys
+        * Work machine: skips OneDrive, debloat, startup disabling and personal apps, and installs the work apps
+        * NAS host, not asked on work machines: the NAS that `G:` maps to
+    * `chezmoi init` also detects a laptop (a battery) and the CPU and GPU vendor. Run it again after changing hardware
+    * Installs apps with winget from `home/.chezmoidata/packages.yaml`
+        * `winget`: every machine
+        * `winget_desktop`: drivers, services and large installers, everywhere except CI
+        * `winget_server`: only on the home server
+        * `winget_dev`: only on dev machines
+        * `winget_work`: only on work machines
+        * `winget_personal`: not on work machines or the home server
+        * `winget_nvidia`: only where the GPU is NVIDIA
+        * CI installs only `winget`
+    * Uninstalls the apps in `winget_remove` and `programs_remove` on every apply, except on work machines
+    * Upgrades the tracked winget packages on every apply, and lists any that fail
+    * Asks about winget packages that `packages.yaml` doesn't track: track, uninstall or skip. Without a terminal, and in CI, it only lists them
+    * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar, except on work machines
+    * Disables hibernation, except on laptops. Laptops hibernate after 30 minutes asleep on battery and never on AC
+    * Sets the high performance power plan, except on laptops
+    * Disables the OneDrive sync client with a policy, except on work machines, and moves Desktop, Documents and Pictures out of OneDrive. The files are copied and the OneDrive copies stay in place
+    * Maps `G:` to `\\<NAS host>\Google Drive`, except on work machines. Enter the NAS credentials once in Windows Credential Manager
+    * Seeds MultiViewer preferences, FancyZones layouts, hotkeys and settings, and Windows Terminal settings, only when the app hasn't created its own files yet
     * Installs Vim from winget (9.2) with the same config as Linux (`~/_vimrc` and `~/vimfiles`)
     * Sets up the PowerShell 7 profile (`~/.config/powershell/profile.ps1`, loaded through a stub at your real `$PROFILE`):
       history suggestions, `eza` for `ls`, `zoxide`, fzf key bindings (PSFzf), a starship prompt, and the `dev`, `p`, `g` shortcuts
     * Disables Multiplane Overlay (fixes Chrome freezing with several video streams, needs a restart)
     * Keeps Chrome windows on black, square borders with a logon task (`~/Scripts/Set-ChromeBorder.ps1`)
-    * Installs AutoHotkey v2 and starts `~/Scripts/AutoHotkey/multimedia-control.ahk` at sign-in
-    * Disables the startup entries listed in `packages.startup_disable` that exist on the machine
+    * Installs AutoHotkey v2, and on the home server starts `~/Scripts/AutoHotkey/multimedia-control.ahk` at sign-in
+    * Disables the startup entries listed in `packages.startup_disable` that exist on the machine, except on work machines
     * Installs WSL 2, Ubuntu, and the `Source Code Pro` font
     * `.ps1` scripts run with `pwsh -ExecutionPolicy Bypass`, so no execution policy change is needed
 1. Update all motherboard drivers
@@ -71,9 +88,15 @@ Open Ubuntu, then:
 > sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply umamialex
 ```
 
-This installs the apt packages, [mise](https://mise.jdx.dev) tools (node, go, kubectl, helm, gh, trufflehog, fzf, fd, bat, eza, zoxide),
+This installs the apt packages, [mise](https://mise.jdx.dev) tools (node, go, kubectl, helm, gh, trufflehog, fzf, fd, bat, eza, zoxide, ruff),
 the fish and tmux plugins, the Vim plugins (native packages, pinned by commit), and sets fish as the login shell.
 Vim itself comes from apt, so it is Ubuntu's version (9.1); Windows gets the newer one from winget.
+
+* Dev machines also get terraform, opentofu, k6 and jq from mise
+* Asks about apt packages that `packages.yaml` doesn't track, the same way as winget
+* Turns on systemd in `/etc/wsl.conf`, which needs `wsl --shutdown` from Windows to take effect
+* Mounts the NAS at `/mnt/gdrive` when Windows doesn't map `G:`, except on work machines
+* Runs trufflehog on the staged changes before every commit, in every repo. Skip it for one commit with `git commit --no-verify`
 
 ## Day to day
 
@@ -92,7 +115,8 @@ and `run_once_*` scripts run once per machine.
 | Path | Purpose |
 |---|---|
 | `home/` | chezmoi source directory (`.chezmoiroot`) |
-| `home/.chezmoidata/packages.yaml` | apt packages, winget apps (core, desktop, server), startup entries to disable, and Appx packages to remove |
+| `home/.chezmoidata/packages.yaml` | apt packages, winget apps (core, desktop, server, dev, work, personal, NVIDIA), apps to uninstall, startup entries to disable, and Appx packages to remove |
+| `home/.chezmoitemplates/` | the shared vimrc, the winget id lists, and the mise tool list |
 | `home/.chezmoiexternal.toml.tmpl` | pinned mise binary, Vundle, and tpm |
 | `home/run_*` | install scripts for Linux (`.sh`) and Windows (`.ps1`) |
 | `home/Scripts/` | Windows-only scripts: Chrome border watcher and AutoHotkey hotkeys |
@@ -113,8 +137,14 @@ chezmoi only knows the lists in `packages.yaml`, so these scripts compare them w
 ```
 
 Each prints packages that are installed but not tracked, and tracked packages that are missing.
+The Windows list follows your answers to `chezmoi init`, so it only counts what this machine should have.
 Runtimes and system packages are skipped through `packages.audit_ignore`.
 `chezmoi unmanaged <dir>` does the same for files.
+
+`chezmoi apply` also asks about each untracked package: track it, uninstall it, or skip it.
+Tracking appends it to a section of `packages.yaml` and leaves the change uncommitted, so review it and commit it.
+Skipped packages are remembered per machine, and a blank answer asks again next time.
+To remove an app on every machine, add it to `winget_remove`, or to `programs_remove` if winget has no package for it.
 
 ## Backups
 
@@ -144,17 +174,20 @@ and fails on verified or unverifiable secrets. To scan locally (mise installs `t
 > trufflehog git file://. --no-update --no-verification
 ```
 
+On Linux a pre-commit hook runs the same scanner on the staged changes before every commit, in every repo.
+It blocks the commit on verified or unverifiable findings, and when trufflehog isn't installed.
+Windows has no trufflehog install, so the hook isn't wired there.
+
 ## Maintenance
 
 * **mise:** the binary is pinned in `home/.chezmoiexternal.toml.tmpl`. To bump it, update
   the version and the sha256 checksums from the release's `SHASUMS256.txt`.
 * **Vim plugins:** pinned by commit in `home/.chezmoidata/vim.yaml`. To update one, change its commit; chezmoi downloads it and regenerates the help tags.
 * **fisher:** pinned by version and sha256 in `home/run_onchange_after_30-plugins.sh.tmpl`.
-* **chezmoi in CI:** pinned by version and sha256 in `.github/workflows/ci.yml`.
+* **chezmoi in CI:** the latest release, checked against the checksums file published with it.
 * **Actions:** pinned by commit SHA, updated weekly by Dependabot.
 
-CI applies the dotfiles on clean Ubuntu and Windows runners (skipping the desktop and server
-winget lists), runs a smoke test, and checks that a second apply changes nothing. It also runs weekly to catch upstream breakage.
+CI applies the dotfiles on clean Ubuntu and Windows runners (answering dev yes, home server no and work no, and installing only the base winget list), runs a smoke test, and checks that a second apply changes nothing. It also runs weekly to catch upstream breakage.
 
 A job only runs when the change could affect it (`scripts/ci-changes.sh`): a README or backup
 change runs only the secret scan, a fish change skips the Windows job, and a PowerShell change
