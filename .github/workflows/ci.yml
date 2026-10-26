@@ -103,7 +103,7 @@ jobs:
           set -e
           for cmd in "fish --version" "git --version" "git lfs version" "tmux -V" "vim --version" \
                      "ag --version" "htop --version" "mise --version" "node -v" "go version" \
-                     "kubectl version --client" "helm version --short" "fisher --version" \
+                     "kubectl version --client" "helm version --short" "gh --version" "fisher --version" \
                      "type -q tide"; do
             echo "+ $cmd"
             fish -c "$cmd" > /dev/null
