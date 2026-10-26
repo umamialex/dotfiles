@@ -115,6 +115,21 @@ Each prints packages that are installed but not tracked, and tracked packages th
 Runtimes and system packages are skipped through `packages.audit_ignore`.
 `chezmoi unmanaged <dir>` does the same for files.
 
+## Encrypted backups
+
+Settings that live inside an app (for example FrankerFaceZ in Chrome) can be backed up as an
+[age](https://github.com/FiloSottile/age)-encrypted file in `backups/`. The repo is public, so
+it uses a key pair, not a password. `.gitignore` only lets `backups/*.age` through.
+
+```
+> age-keygen -o ~/.config/age/key.txt                 # once; keep the private key in a password manager
+> age -r <public key> -o backups/ffz-settings.json.age ffz-settings.json   # encrypt, then delete the JSON
+> age -d -i ~/.config/age/key.txt -o ffz-settings.json backups/ffz-settings.json.age   # decrypt
+```
+
+For FrankerFaceZ: twitch.tv, FFZ Control Center, Data Management, Backup and Restore. Restoring
+is manual, through the same screen. `age` is installed by mise on Linux and by winget on Windows.
+
 ## Secret scanning
 
 CI scans the full git history with [TruffleHog](https://github.com/trufflesecurity/trufflehog) (free, AGPL-3.0)

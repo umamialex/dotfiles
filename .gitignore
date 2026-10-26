@@ -1,2 +1,6 @@
 env.fish
 nodesource_setup.sh
+
+# only encrypted backups (age) belong in the repo, never the plaintext
+backups/*
+!backups/*.age
