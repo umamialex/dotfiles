@@ -14,3 +14,7 @@ set -gx PATH ~/.local/bin ~/go/bin $PATH
 if test -e ~/.config/fish/env.fish
   source ~/.config/fish/env.fish
 end
+
+if type -q mise
+  mise activate fish | source
+end
