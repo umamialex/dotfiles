@@ -49,6 +49,27 @@ packages:
     - LianLi.LConnect3
     - LizardByte.Sunshine
     - NZXT.CAM
+  # packages the audit scripts (scripts/audit-packages.*) skip when listing untracked packages, * matches any suffix
+  audit_ignore:
+    winget:
+      - Canonical.Ubuntu
+      - Microsoft.AppInstaller
+      - Microsoft.DirectX
+      - Microsoft.DotNet.*
+      - Microsoft.Edge
+      - Microsoft.GameInput
+      - Microsoft.UI.Xaml.*
+      - Microsoft.VCLibs.*
+      - Microsoft.VCRedist.*
+      - Microsoft.WSL
+      - Microsoft.WindowsAppRuntime.*
+      - Python.Launcher
+    apt:
+      - apt-transport-https
+      - gnupg
+      - lib*
+      - lsb-base
+      - ubuntu-wsl
   startup_disable:
     run: # HKCU Run entries, * matches the per-machine suffix
       - GarminExpress
