@@ -18,6 +18,7 @@ packages:
     - CPUID.HWMonitor
     - Discord.Discord
     - Google.Chrome
+    - marlocarlo.psmux
     - Microsoft.PowerShell
     - SlackTechnologies.Slack
     - Spotify.Spotify
