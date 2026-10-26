@@ -1,0 +1,171 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CHEZMOI_VERSION: 2.73.3
+  CHEZMOI_LINUX_SHA256: 6e5827598cbfc02d132b04f95b5ea10efb5b79230e2a4a0e52df4af144a8ee9f
+  CHEZMOI_WINDOWS_SHA256: e74f9948a9ac6a5d8b0c0896a9ea129a766d92e38b50b70ee1fa1dc077755d6e
+  ACTIONLINT_VERSION: 1.7.12
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install chezmoi
+        run: |
+          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
+          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install actionlint
+        run: |
+          curl -fsSL -o actionlint.tar.gz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+          tar -xzf actionlint.tar.gz -C "$HOME/.local/bin" actionlint
+
+      - name: Lint workflows
+        run: actionlint
+
+      - name: Render templates
+        run: |
+          mkdir rendered
+          cd home
+          for f in run_*.sh.tmpl; do
+            chezmoi --source "$GITHUB_WORKSPACE" execute-template < "$f" > "../rendered/${f%.tmpl}"
+          done
+          for f in run_*.ps1.tmpl; do
+            chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data '{"chezmoi":{"os":"windows"}}' < "$f" > "../rendered/${f%.tmpl}"
+          done
+          chezmoi --source "$GITHUB_WORKSPACE" execute-template < .chezmoiexternal.toml.tmpl > ../rendered/chezmoiexternal.toml
+
+      - name: Check shell scripts
+        run: |
+          for f in rendered/*.sh; do
+            bash -n "$f"
+            shellcheck "$f"
+          done
+
+      - name: Check external config is valid TOML
+        run: python3 -c "import tomllib; tomllib.load(open('rendered/chezmoiexternal.toml', 'rb'))"
+
+      - name: Check PowerShell scripts
+        shell: pwsh
+        run: |
+          foreach ($file in Get-ChildItem rendered -Filter *.ps1) {
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors)
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error "$($file.Name):$($_.Extent.StartLineNumber) $($_.Message)" }
+              exit 1
+            }
+            Write-Host "OK $($file.Name)"
+          }
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install chezmoi
+        run: |
+          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
+          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Apply dotfiles
+        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com"
+
+      - name: Smoke test
+        run: |
+          set -e
+          for cmd in "fish --version" "git --version" "git lfs version" "tmux -V" "vim --version" \
+                     "ag --version" "htop --version" "mise --version" "node -v" "go version" \
+                     "kubectl version --client" "helm version --short" "fisher --version" \
+                     "type -q tide"; do
+            echo "+ $cmd"
+            fish -c "$cmd" > /dev/null
+          done
+          fish -n "$HOME/.config/fish/config.fish"
+          test "$(git config --global user.email)" = "ci@example.com"
+          test -d "$HOME/.vim/bundle/ale"
+          test -d "$HOME/.tmux/plugins/tmux-sensible"
+
+      - name: Check idempotency
+        run: |
+          chezmoi apply --verbose
+          chezmoi verify
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install chezmoi
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/twpayne/chezmoi/releases/download/v$env:CHEZMOI_VERSION/chezmoi_${env:CHEZMOI_VERSION}_windows_amd64.zip" -OutFile chezmoi.zip
+          if ((Get-FileHash chezmoi.zip -Algorithm SHA256).Hash.ToLower() -ne $env:CHEZMOI_WINDOWS_SHA256) { throw 'chezmoi checksum mismatch' }
+          Expand-Archive chezmoi.zip -DestinationPath "$env:RUNNER_TEMP\chezmoi"
+          "$env:RUNNER_TEMP\chezmoi" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Ensure winget
+        shell: pwsh
+        run: |
+          if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+            Install-PSResource -Name Microsoft.WinGet.Client -Repository PSGallery -TrustRepository
+            Repair-WinGetPackageManager -AllUsers
+          }
+          winget --version
+
+      - name: Apply dotfiles
+        shell: pwsh
+        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com"
+
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($id in @('7zip.7zip', 'CPUID.HWMonitor', 'Discord.Discord', 'Google.Chrome', 'SlackTechnologies.Slack', 'Spotify.Spotify', 'TechPowerUp.GPU-Z', 'Valve.Steam', 'VideoLAN.VLC', 'Zoom.Zoom')) {
+            winget list --id $id --exact --source winget | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "$id is not installed" }
+          }
+          if (-not (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\SourceCodePro-Regular.ttf")) { throw 'Source Code Pro not installed' }
+          if ((Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR').AppCaptureEnabled -ne 0) { throw 'Game Bar capture still enabled' }
+          if ((Get-ItemProperty 'HKCU:\System\GameConfigStore').GameDVR_Enabled -ne 0) { throw 'GameDVR still enabled' }
+          if ((Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Power').HibernateEnabled -ne 0) { throw 'Hibernation still enabled' }
+          powercfg /getactivescheme
+          wsl --status
+          if ((git config --global user.email) -ne 'ci@example.com') { throw 'gitconfig not rendered' }
+          foreach ($path in '.vimrc', '.tmux.conf', '.config') {
+            if (Test-Path (Join-Path $HOME $path)) { throw "$path should be ignored on Windows" }
+          }
+
+      - name: Check idempotency
+        shell: pwsh
+        run: |
+          chezmoi apply --verbose
+          chezmoi verify
