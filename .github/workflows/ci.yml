@@ -130,6 +130,8 @@ jobs:
             echo "+ $cmd"
             fish -c "$cmd" > /dev/null
           done
+          fish --version | grep -q 'version 4\.'
+          fish -ic 'abbr --query k; and abbr --query dev' < /dev/null
           fish -n "$HOME/.config/fish/config.fish"
           test "$(git config --global user.email)" = "ci@example.com"
           test -d "$HOME/.vim/bundle/ale"
