@@ -15,6 +15,7 @@ packages:
     - vim
   winget:
     - 7zip.7zip
+    - AutoHotkey.AutoHotkey
     - CPUID.HWMonitor
     - Discord.Discord
     - Google.Chrome
@@ -26,6 +27,18 @@ packages:
     - Valve.Steam
     - VideoLAN.VLC
     - Zoom.Zoom
+  startup_disable:
+    run: # HKCU Run entries, * matches the per-machine suffix
+      - GarminExpress
+      - GoogleChromeAutoLaunch_*
+      - MicrosoftEdgeAutoLaunch_*
+      - MOZA Pit House
+      - RazerAppEngine
+      - Unified Remote V3
+      - com.squirrel.slack.slack
+    startup_folder:
+      - GoXLR App.lnk
+      - GoXLR Control Panel Autostart.lnk
   appx_remove:
     - Microsoft.XboxApp # Xbox
     - Microsoft.XboxGameOverlay # Xbox Game Bar

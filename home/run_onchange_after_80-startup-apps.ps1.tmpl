@@ -1,0 +1,36 @@
+{{- if eq .chezmoi.os "windows" -}}
+#Requires -RunAsAdministrator
+# startup list hash: {{ .packages.startup_disable | toJson | sha256sum }}
+$ErrorActionPreference = 'Stop'
+
+$runEntries = @('{{ .packages.startup_disable.run | join "','" }}')
+$folderEntries = @('{{ .packages.startup_disable.startup_folder | join "','" }}')
+
+$explorer = 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved'
+
+# Same format Task Manager writes: first byte 3 = disabled, then the time it was disabled.
+function Disable-StartupEntry($key, $name) {
+  if (-not (Test-Path $key)) { New-Item -Path $key | Out-Null }
+  $value = [byte[]](3, 0, 0, 0) + [BitConverter]::GetBytes([DateTime]::UtcNow.ToFileTimeUtc())
+  Set-ItemProperty -Path $key -Name $name -Value $value -Type Binary
+  Write-Host "Disabled startup entry: $name"
+}
+
+# Only touches entries that exist on this machine, so a missing app is not an error.
+$present = (Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run').Property
+foreach ($pattern in $runEntries) {
+  foreach ($name in @($present | Where-Object { $_ -like $pattern })) {
+    Disable-StartupEntry "HKCU:\$explorer\Run" $name
+  }
+}
+
+$folders = @(
+  @{ Path = Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs\StartUp'; Key = "HKLM:\$explorer\StartupFolder" },
+  @{ Path = [Environment]::GetFolderPath('Startup'); Key = "HKCU:\$explorer\StartupFolder" }
+)
+foreach ($folder in $folders) {
+  foreach ($name in $folderEntries) {
+    if (Test-Path (Join-Path $folder.Path $name)) { Disable-StartupEntry $folder.Key $name }
+  }
+}
+{{- end }}
