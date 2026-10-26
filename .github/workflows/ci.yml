@@ -158,7 +158,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Apply dotfiles
-        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
+        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com,NAS host=ci-nas.invalid" --promptBool "Dev machine=true,Home server=false,Work machine=false"
 
       - name: Smoke test
         run: |
@@ -220,22 +220,28 @@ jobs:
 
       - name: Apply dotfiles
         shell: pwsh
-        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
+        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com,NAS host=ci-nas.invalid" --promptBool "Dev machine=true,Home server=false,Work machine=false"
 
       - name: Smoke test
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $packages = (chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).packages
-          foreach ($id in $packages.winget) {
+          # the expected set comes from the same template the install script uses
+          $expected = @('{{ includeTemplate "winget-ids" . }}' | chezmoi --source "$env:GITHUB_WORKSPACE" execute-template) | Where-Object { $_ }
+          if ($expected.Count -ne @($packages.winget).Count) { throw "CI should only install the base winget list, got: $($expected -join ', ')" }
+          foreach ($id in $expected) {
             winget list --id $id --exact --source winget | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "$id is not installed" }
           }
-          # drivers, services and server-only apps must be skipped in CI
-          foreach ($id in @($packages.winget_desktop) + @($packages.winget_server)) {
+          # drivers, services, and the dev, work, personal, server and GPU apps must be skipped in CI
+          $skipped = @($packages.winget_desktop) + @($packages.winget_server) + @($packages.winget_dev) + @($packages.winget_work) + @($packages.winget_personal) + @($packages.winget_nvidia)
+          foreach ($id in $skipped) {
             winget list --id $id --exact --source winget | Out-Null
             if ($LASTEXITCODE -eq 0) { throw "$id should not be installed in CI" }
           }
+          # the audit must run, and may report packages the runner image ships
+          & "$env:GITHUB_WORKSPACE\scripts\audit-packages.ps1"
           if (-not (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\SourceCodePro-Regular.ttf")) { throw 'Source Code Pro not installed' }
           if ((Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR').AppCaptureEnabled -ne 0) { throw 'Game Bar capture still enabled' }
           if ((Get-ItemProperty 'HKCU:\System\GameConfigStore').GameDVR_Enabled -ne 0) { throw 'GameDVR still enabled' }

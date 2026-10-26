@@ -19,8 +19,6 @@ packages:
     - ajeetdsouza.zoxide
     - astral-sh.ruff
     - AutoHotkey.AutoHotkey
-    - beeradmoore.dlss-swapper
-    - CPUID.HWMonitor
     - Discord.Discord
     - eza-community.eza
     - Git.Git
@@ -34,24 +32,20 @@ packages:
     - NirSoft.SoundVolumeView
     - Notepad++.Notepad++
     - Python.Python.3.13
-    - REALiX.HWiNFO
     - sharkdp.bat
     - sharkdp.fd
     - Resplendence.WhoCrashed
     - Starship.Starship
     - SlackTechnologies.Slack
-    - TechPowerUp.GPU-Z
     - Valve.Steam
     - VideoLAN.VLC
     - vim.vim
-    - Zoom.Zoom
   # modules installed from the PowerShell Gallery, pinned to an exact version
   powershell_modules:
     PSFzf: 2.7.12
   # drivers, services and large installers, skipped in CI
   winget_desktop:
     - Adobe.CreativeCloud
-    - Garmin.Express
     - Parsec.Parsec
     - ViGEm.ViGEmBus
   # Microsoft Store apps, installed with --source msstore and skipped in CI.
@@ -60,9 +54,44 @@ packages:
     - 9NCBCSZSJRSB # Spotify
   # only on the home server (answer "yes" to the Home server prompt), skipped in CI
   winget_server:
+    - CPUID.HWMonitor
     - LianLi.LConnect3
     - LizardByte.Sunshine
     - NZXT.CAM
+    - REALiX.HWiNFO
+    - TechPowerUp.GPU-Z
+  # only on dev machines (answer "yes" to the Dev machine prompt), skipped in CI
+  winget_dev:
+    - Anthropic.Claude
+    - ArduinoSA.IDE.stable
+    - Docker.DockerDesktop
+  # only on work machines (answer "yes" to the Work machine prompt), skipped in CI
+  winget_work:
+    - Zoom.Zoom
+  # personal apps: skipped on work machines and on the home server, skipped in CI
+  winget_personal:
+    - MoonlightGameStreamingProject.Moonlight
+    - Plex.Plex
+    - Ubiquiti.WiFimanDesktop
+  # only where the GPU is NVIDIA (detected at chezmoi init), skipped in CI
+  winget_nvidia:
+    - beeradmoore.dlss-swapper
+  # uninstalled on every apply when found, except on work machines. Windows may reinstall some of these.
+  winget_remove:
+    - Audacity.Audacity
+    - Descript.Descript
+    - Google.GoogleDrive
+    - Microsoft.365Copilot
+    - Microsoft.Outlook
+    - Microsoft.Teams
+    - Streamlabs.Streamlabs
+    - webosbrew.webOSDevManager
+    - Yubico.YubikeyManager
+    - Zoom.Zoom.EXE
+    - Zoom.ZoomVDIUniversalPlugin
+  # programs winget doesn't carry, matched by display name and uninstalled the same way
+  programs_remove:
+    - Lenovo Now
   # packages the audit scripts (scripts/audit-packages.*) skip when listing untracked packages, * matches any suffix
   audit_ignore:
     winget:
@@ -77,6 +106,8 @@ packages:
       - Microsoft.VCRedist.*
       - Microsoft.WSL
       - Microsoft.WindowsAppRuntime.*
+      - Nvidia.PhysX
+      - Parsec.ParsecVUD
       - Python.Launcher
     apt:
       - apt-transport-https
@@ -86,17 +117,20 @@ packages:
       - ubuntu-wsl
   startup_disable:
     run: # HKCU Run entries, * matches the per-machine suffix
-      - GarminExpress
       - GoogleChromeAutoLaunch_*
       - MicrosoftEdgeAutoLaunch_*
       - MOZA Pit House
       - RazerAppEngine
       - Unified Remote V3
       - com.squirrel.slack.slack
+    run_machine: # HKLM Run entries, 64-bit and 32-bit
+      - Adobe CCXProcess
+      - Adobe Creative Cloud
     startup_folder:
       - GoXLR App.lnk
       - GoXLR Control Panel Autostart.lnk
   appx_remove:
+    - E046963F.LenovoCompanion # Lenovo Companion
     - Microsoft.XboxApp # Xbox
     - Microsoft.XboxGameOverlay # Xbox Game Bar
     - Microsoft.XboxGamingOverlay # Xbox Gaming Overlay
