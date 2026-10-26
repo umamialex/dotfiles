@@ -1,0 +1,8 @@
+{{- if eq .chezmoi.os "windows" -}}
+#Requires -RunAsAdministrator
+$ErrorActionPreference = 'Stop'
+
+wsl --install --no-distribution
+wsl --update
+wsl --set-default-version 2
+{{- end }}
