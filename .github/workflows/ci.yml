@@ -73,7 +73,7 @@ jobs:
       - name: Check PowerShell scripts
         shell: pwsh
         run: |
-          foreach ($file in Get-ChildItem rendered, scripts -Filter *.ps1) {
+          foreach ($file in Get-ChildItem rendered, scripts, home/dot_config/powershell -Filter *.ps1) {
             $errors = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors)
             if ($errors.Count -gt 0) {
@@ -205,6 +205,19 @@ jobs:
             if (-not (Test-Path (Join-Path $HOME $path))) { throw "$path not applied" }
           }
           if (Select-String -Path (Join-Path $HOME '.tmux.conf') -Pattern 'tpm' -Quiet) { throw 'tpm should not be in the Windows tmux config' }
+          # winget changes PATH after this job started, so reload it like a new terminal would
+          $env:PATH = [Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('PATH', 'User')
+          foreach ($tool in 'fzf', 'fd', 'bat', 'eza', 'zoxide', 'starship') {
+            if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { throw "$tool is not on PATH" }
+          }
+          foreach ($path in '.config\powershell\profile.ps1', '.config\starship.toml') {
+            if (-not (Test-Path (Join-Path $HOME $path))) { throw "$path not applied" }
+          }
+          if (-not (Get-InstalledPSResource -Name PSFzf -Version 2.7.12 -ErrorAction SilentlyContinue)) { throw 'PSFzf is not installed' }
+          if (-not (Get-Content $PROFILE.CurrentUserCurrentHost -Raw).Contains('.config\powershell\profile.ps1')) { throw 'profile stub missing' }
+          # a fresh pwsh loads the real profile through the stub
+          $loaded = pwsh -NoLogo -Command '(Get-Command ls).CommandType; (Get-Command dev).CommandType; [bool](Get-Command z); [bool](Get-Command prompt)'
+          if (($loaded -join ' ') -ne 'Function Function True True') { throw "profile did not load: $($loaded -join ' ')" }
 
       - name: Check idempotency
         shell: pwsh
