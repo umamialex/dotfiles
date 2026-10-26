@@ -96,7 +96,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Apply dotfiles
-        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com"
+        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
 
       - name: Smoke test
         run: |
@@ -143,15 +143,21 @@ jobs:
 
       - name: Apply dotfiles
         shell: pwsh
-        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com"
+        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
 
       - name: Smoke test
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          foreach ($id in @('7zip.7zip', 'AutoHotkey.AutoHotkey', 'CPUID.HWMonitor', 'Discord.Discord', 'Google.Chrome', 'marlocarlo.psmux', 'Microsoft.PowerShell', 'SlackTechnologies.Slack', 'Spotify.Spotify', 'TechPowerUp.GPU-Z', 'Valve.Steam', 'VideoLAN.VLC', 'Zoom.Zoom')) {
+          $packages = (chezmoi data --format json | ConvertFrom-Json).packages
+          foreach ($id in $packages.winget) {
             winget list --id $id --exact --source winget | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "$id is not installed" }
+          }
+          # drivers, services and server-only apps must be skipped in CI
+          foreach ($id in @($packages.winget_desktop) + @($packages.winget_server)) {
+            winget list --id $id --exact --source winget | Out-Null
+            if ($LASTEXITCODE -eq 0) { throw "$id should not be installed in CI" }
           }
           if (-not (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\SourceCodePro-Regular.ttf")) { throw 'Source Code Pro not installed' }
           if ((Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR').AppCaptureEnabled -ne 0) { throw 'Game Bar capture still enabled' }
