@@ -31,3 +31,17 @@ setenv AGG_CONTENTFUL_FETCH_INTERVAL 900
 if test -e ~/.config/fish/env.fish
   . ~/.config/fish/env.fish
 end
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+if test -f /home/umamialex/miniconda3/bin/conda
+    eval /home/umamialex/miniconda3/bin/conda "shell.fish" "hook" $argv | source
+else
+    if test -f "/home/umamialex/miniconda3/etc/fish/conf.d/conda.fish"
+        . "/home/umamialex/miniconda3/etc/fish/conf.d/conda.fish"
+    else
+        set -x PATH "/home/umamialex/miniconda3/bin" $PATH
+    end
+end
+# <<< conda initialize <<<
+
