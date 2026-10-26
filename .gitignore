@@ -1,6 +1,7 @@
 env.fish
 nodesource_setup.sh
 
-# only encrypted backups (age) belong in the repo, never the plaintext
+# backups: only age-encrypted files, plus plaintext files that were reviewed and approved by name
 backups/*
 !backups/*.age
+!backups/ffz-settings.json
