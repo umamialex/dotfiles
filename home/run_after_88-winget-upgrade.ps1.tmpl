@@ -1,0 +1,32 @@
+{{- if and (eq .chezmoi.os "windows") (ne (env "CI") "true") -}}
+{{- $ids := includeTemplate "winget-ids" . | splitList "\n" | compact -}}
+{{- $store := includeTemplate "winget-store-ids" . | splitList "\n" | compact -}}
+$ErrorActionPreference = 'Stop'
+
+# Upgrades the packages this machine tracks, on every apply. An app that is open or fails to
+# upgrade is reported at the end and doesn't stop the rest.
+$ids = @('{{ $ids | join "','" }}') | Where-Object { $_ }
+$storeIds = @('{{ $store | join "','" }}') | Where-Object { $_ }
+
+# winget's exit code for "no newer version", which is not a failure
+$noUpdate = -1978335189
+$failed = @()
+
+function Update-App($id, $source) {
+  winget list --id $id --exact --source $source --accept-source-agreements | Out-Null
+  if ($LASTEXITCODE -ne 0) { return }
+
+  winget upgrade --id $id --exact --source $source --silent --accept-package-agreements --accept-source-agreements
+  if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $noUpdate) {
+    Write-Warning "winget upgrade failed for $id (exit code $LASTEXITCODE)"
+    $script:failed += $id
+  }
+}
+
+foreach ($id in $ids) { Update-App $id 'winget' }
+foreach ($id in $storeIds) { Update-App $id 'msstore' }
+
+if ($failed.Count -gt 0) {
+  Write-Warning "could not upgrade: $($failed -join ', ')"
+}
+{{- end }}

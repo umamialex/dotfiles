@@ -1,0 +1,42 @@
+{{- $work := and (hasKey . "work") .work -}}
+{{- if and (eq .chezmoi.os "windows") (ne (env "CI") "true") (not $work) -}}
+$ErrorActionPreference = 'Stop'
+
+# Uninstalls what packages.winget_remove and packages.programs_remove list, silently, on every apply.
+# Work machines skip it, because a company image may need some of these apps.
+$ids = @('{{ .packages.winget_remove | join "','" }}') | Where-Object { $_ }
+$names = @('{{ .packages.programs_remove | join "','" }}') | Where-Object { $_ }
+$failed = @()
+
+foreach ($id in $ids) {
+  winget list --id $id --exact --accept-source-agreements | Out-Null
+  if ($LASTEXITCODE -ne 0) { continue }
+
+  Write-Host "Uninstalling $id"
+  winget uninstall --id $id --exact --silent --accept-source-agreements
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warning "winget uninstall failed for $id (exit code $LASTEXITCODE)"
+    $failed += $id
+  }
+}
+
+# programs winget has no package for, matched by the display name in Add or remove programs
+$uninstallKeys = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+  'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*',
+  'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
+foreach ($name in $names) {
+  $found = Get-ItemProperty $uninstallKeys -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -eq $name }
+  if (-not $found) { continue }
+
+  Write-Host "Uninstalling $name"
+  winget uninstall --name $name --exact --silent --accept-source-agreements
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warning "winget uninstall failed for $name (exit code $LASTEXITCODE), remove it from Settings, Apps"
+    $failed += $name
+  }
+}
+
+if ($failed.Count -gt 0) {
+  Write-Warning "could not uninstall: $($failed -join ', ')"
+}
+{{- end }}
