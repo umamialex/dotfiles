@@ -252,8 +252,13 @@ jobs:
           foreach ($plugin in 'vim-fugitive', 'ale', 'falcon', 'vim-styled-components', 'vim-jsonnet') {
             if (-not (Test-Path (Join-Path $HOME "vimfiles\pack\plugins\start\$plugin"))) { throw "vim plugin $plugin not installed" }
           }
-          $vim = Get-ChildItem "${env:ProgramFiles(x86)}\Vim", "$env:ProgramFiles\Vim" -Filter vim.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-          if (-not $vim) { throw 'vim.exe not found' }
+          # Vim's installer records gvim.exe's path under HKCU (per-user install) or HKLM (all users)
+          $vim = $null
+          foreach ($key in 'HKCU:\Software\Vim\Gvim', 'HKLM:\Software\Vim\Gvim', 'HKLM:\Software\WOW6432Node\Vim\Gvim') {
+            $gvim = (Get-ItemProperty $key -ErrorAction SilentlyContinue).path
+            if ($gvim) { $vim = Join-Path (Split-Path $gvim) 'vim.exe'; break }
+          }
+          if (-not $vim -or -not (Test-Path $vim)) { throw "vim.exe not found (registry says: $vim)" }
           $vimOut = Join-Path $env:TEMP 'vim-check.txt'
           & $vim -es -N -u (Join-Path $HOME '_vimrc') -c "redir! > $vimOut" -c 'echo get(g:, "colors_name", "NONE")' -c 'echo string(map(ale#linter#Get("python"), "v:val.name"))' -c 'redir END' -c 'qa!'
           $vimResult = Get-Content $vimOut -Raw
