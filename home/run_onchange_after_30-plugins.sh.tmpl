@@ -2,7 +2,7 @@
 #!/bin/bash
 # plugin list hashes:
 #   fish: {{ include "dot_config/fish/fish_plugins" | sha256sum }}
-#   vim:  {{ include "dot_vimrc" | sha256sum }}
+#   vim:  {{ .vim_plugins | toJson | sha256sum }}
 #   tmux: {{ include "dot_tmux.conf.tmpl" | sha256sum }}
 set -euo pipefail
 
@@ -15,8 +15,8 @@ curl -fsSL "https://raw.githubusercontent.com/jorgebucaran/fisher/$FISHER_VERSIO
 echo "$FISHER_SHA256  $fisher_file" | sha256sum -c --quiet -
 fish -c "source '$fisher_file'; and fisher update"
 
-# vim: install bundles listed in .vimrc
-vim +PluginInstall +qall
+# vim: generate help tags for the plugins chezmoi installed as native packages
+vim -es -u NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
 
 # tmux: install plugins listed in .tmux.conf (tpm needs a running server)
 tmux new-session -d -s chezmoi-tpm "sleep 60"

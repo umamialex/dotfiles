@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "windows" -}}
+# vim plugins hash: {{ .vim_plugins | toJson | sha256sum }}
+$ErrorActionPreference = 'Stop'
+
+# winget changes PATH after this session started, so fall back to where the installer puts vim
+$vim = (Get-Command vim -ErrorAction SilentlyContinue).Source
+if (-not $vim) {
+  $vim = Get-ChildItem "${env:ProgramFiles(x86)}\Vim", "$env:ProgramFiles\Vim" -Filter vim.exe -Recurse -ErrorAction SilentlyContinue |
+    Select-Object -First 1 -ExpandProperty FullName
+}
+if (-not $vim) { throw 'vim.exe not found' }
+
+# generate help tags for the plugins chezmoi installed as native packages
+& $vim -es -u NONE -N -c 'packloadall' -c 'helptags ALL' -c 'qa!'
+if ($LASTEXITCODE -ne 0) { throw "vim exited with code $LASTEXITCODE" }
+{{- end }}

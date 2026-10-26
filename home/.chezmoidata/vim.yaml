@@ -1,0 +1,18 @@
+# Vim plugins, installed as native packages (:help packages) by .chezmoiexternal.toml.tmpl.
+# Each one is pinned to a commit. To update a plugin, change its commit.
+vim_plugins:
+  - name: vim-fugitive
+    repo: tpope/vim-fugitive
+    commit: 3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0
+  - name: ale
+    repo: dense-analysis/ale
+    commit: 422c0e8ef42e2315a5b58dc281fccc59b816c37a
+  - name: falcon
+    repo: fenetikm/falcon
+    commit: 276cd483c73f5389f0bd99b18e2452bd57b77bf6
+  - name: vim-styled-components
+    repo: styled-components/vim-styled-components
+    commit: 75e178916fc3e61385350933a23055927f5f60b7
+  - name: vim-jsonnet
+    repo: google/vim-jsonnet
+    commit: 4ebc6619ddce5d032a985b42a9864154c3d20e4a

@@ -2,6 +2,8 @@
 Scripts
 .config/powershell
 .config/starship.toml
+_vimrc
+vimfiles
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
 .config/fish
