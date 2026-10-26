@@ -17,7 +17,8 @@ function Disable-StartupEntry($key, $name) {
 }
 
 # Only touches entries that exist on this machine, so a missing app is not an error.
-$present = (Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run').Property
+$runKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
+$present = if (Test-Path $runKey) { (Get-Item $runKey).Property } else { @() }
 foreach ($pattern in $runEntries) {
   foreach ($name in @($present | Where-Object { $_ -like $pattern })) {
     Disable-StartupEntry "HKCU:\$explorer\Run" $name
