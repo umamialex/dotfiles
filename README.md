@@ -47,6 +47,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
         * CI installs only `winget`
     * Uninstalls the apps in `winget_remove` and `programs_remove` on every apply, except on work machines
     * Upgrades the tracked winget packages on every apply, and lists any that fail
+    * Runs `chezmoi apply` inside WSL at the end, so one apply in PowerShell updates both sides. It skips when WSL, Ubuntu or chezmoi in WSL isn't set up yet
     * Asks about winget packages that `packages.yaml` doesn't track: track, uninstall or skip. Without a terminal, and in CI, it only lists them
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar, except on work machines
     * Disables hibernation, except on laptops. Laptops hibernate after 30 minutes asleep on battery and never on AC
