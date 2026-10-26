@@ -1,8 +1,11 @@
 {{ if ne .chezmoi.os "windows" }}
 Scripts
+.config/powershell
+.config/starship.toml
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
-.config
+.config/fish
+.config/mise
 .local
 .tmux
 .vim
