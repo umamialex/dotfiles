@@ -1,0 +1,125 @@
+packages:
+  apt:
+    - build-essential
+    - ca-certificates
+    - curl
+    - fish
+    - git
+    - git-lfs
+    - gnupg2
+    - htop
+    - silversearcher-ag
+    - software-properties-common
+    - tmux
+    - unzip
+    - vim
+  # installed on every Windows machine, including CI
+  winget:
+    - 7zip.7zip
+    - ajeetdsouza.zoxide
+    - astral-sh.ruff
+    - AutoHotkey.AutoHotkey
+    - beeradmoore.dlss-swapper
+    - CPUID.HWMonitor
+    - Discord.Discord
+    - eza-community.eza
+    - Git.Git
+    - GitHub.cli
+    - Google.Chrome
+    - junegunn.fzf
+    - marlocarlo.psmux
+    - Microsoft.PowerShell
+    - Microsoft.PowerToys
+    - Microsoft.WindowsTerminal
+    - NirSoft.SoundVolumeView
+    - Notepad++.Notepad++
+    - Python.Python.3.13
+    - REALiX.HWiNFO
+    - sharkdp.bat
+    - sharkdp.fd
+    - Resplendence.WhoCrashed
+    - Starship.Starship
+    - SlackTechnologies.Slack
+    - TechPowerUp.GPU-Z
+    - Valve.Steam
+    - VideoLAN.VLC
+    - vim.vim
+    - Zoom.Zoom
+  # modules installed from the PowerShell Gallery, pinned to an exact version
+  powershell_modules:
+    PSFzf: 2.7.12
+  # drivers, services and large installers, skipped in CI
+  winget_desktop:
+    - Adobe.CreativeCloud
+    - Garmin.Express
+    - Parsec.Parsec
+    - ViGEm.ViGEmBus
+  # Microsoft Store apps, installed with --source msstore and skipped in CI.
+  # The winget-source Spotify installer refuses to run from an elevated session.
+  winget_store:
+    - 9NCBCSZSJRSB # Spotify
+  # only on the home server (answer "yes" to the Home server prompt), skipped in CI
+  winget_server:
+    - LianLi.LConnect3
+    - LizardByte.Sunshine
+    - NZXT.CAM
+  # packages the audit scripts (scripts/audit-packages.*) skip when listing untracked packages, * matches any suffix
+  audit_ignore:
+    winget:
+      - Canonical.Ubuntu
+      - Microsoft.AppInstaller
+      - Microsoft.DirectX
+      - Microsoft.DotNet.*
+      - Microsoft.Edge
+      - Microsoft.GameInput
+      - Microsoft.UI.Xaml.*
+      - Microsoft.VCLibs.*
+      - Microsoft.VCRedist.*
+      - Microsoft.WSL
+      - Microsoft.WindowsAppRuntime.*
+      - Python.Launcher
+    apt:
+      - apt-transport-https
+      - gnupg
+      - lib*
+      - lsb-base
+      - ubuntu-wsl
+  startup_disable:
+    run: # HKCU Run entries, * matches the per-machine suffix
+      - GarminExpress
+      - GoogleChromeAutoLaunch_*
+      - MicrosoftEdgeAutoLaunch_*
+      - MOZA Pit House
+      - RazerAppEngine
+      - Unified Remote V3
+      - com.squirrel.slack.slack
+    startup_folder:
+      - GoXLR App.lnk
+      - GoXLR Control Panel Autostart.lnk
+  appx_remove:
+    - Microsoft.XboxApp # Xbox
+    - Microsoft.XboxGameOverlay # Xbox Game Bar
+    - Microsoft.XboxGamingOverlay # Xbox Gaming Overlay
+    - Microsoft.XboxIdentityProvider # Xbox Identity Provider
+    - Microsoft.XboxSpeechToTextOverlay # Xbox Speech to Text Overlay
+    - Microsoft.YourPhone # Your Phone
+    - Microsoft.WindowsMaps # Maps
+    - Microsoft.GetHelp # Get Help
+    - Microsoft.People # People
+    - Microsoft.3DBuilder # 3D Builder
+    - Microsoft.BingWeather # Bing Weather
+    - Microsoft.Getstarted # Tips
+    - Microsoft.Messaging # Messaging
+    - Microsoft.Microsoft3DViewer # Mixed Reality Viewer
+    - Microsoft.MixedReality.Portal # Mixed Reality Portal
+    - Microsoft.MicrosoftOfficeHub # My Office
+    - Microsoft.MicrosoftStickyNotes # Sticky Notes
+    - Microsoft.Office.OneNote # OneNote
+    - Microsoft.OneConnect # Paid Wi-Fi & Cellular
+    - Microsoft.Outlook.DesktopIntegrationServices # Outlook
+    - Microsoft.SkypeApp # Skype
+    - Microsoft.Wallet # Microsoft Pay
+    - Microsoft.windowscommunicationsapps # Mail & Calendar
+    - Microsoft.WindowsFeedbackHub # Feedback Hub
+    - Microsoft.ZuneMusic # Groove Music
+    - Microsoft.ZuneVideo # Movies & TV

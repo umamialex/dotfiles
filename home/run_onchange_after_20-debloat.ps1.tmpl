@@ -1,0 +1,20 @@
+{{- if eq .chezmoi.os "windows" -}}
+#Requires -RunAsAdministrator
+# appx packages hash: {{ .packages.appx_remove | toJson | sha256sum }}
+$ErrorActionPreference = 'Stop'
+
+$packages = @('{{ .packages.appx_remove | join "','" }}')
+
+foreach ($name in $packages) {
+  Write-Host "Removing $name"
+  Get-AppxPackage "*$name*" -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+}
+
+# Disable Xbox Game Bar
+$gameDvr = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR'
+$gameConfig = 'HKCU:\System\GameConfigStore'
+New-Item -Path $gameDvr -Force | Out-Null
+New-Item -Path $gameConfig -Force | Out-Null
+Set-ItemProperty -Path $gameDvr -Name 'AppCaptureEnabled' -Value 0 -Type DWord
+Set-ItemProperty -Path $gameConfig -Name 'GameDVR_Enabled' -Value 0 -Type DWord
+{{- end }}

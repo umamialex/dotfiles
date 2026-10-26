@@ -1,0 +1,15 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# apt packages hash: {{ .packages.apt | toJson | sha256sum }}
+set -euo pipefail
+
+sudo apt-get update -q
+sudo apt-get install -y -q software-properties-common
+# fish 4 replaces the release-3 PPA, which stopped at 3.7.1
+sudo add-apt-repository -y -r ppa:fish-shell/release-3 || true
+sudo add-apt-repository -y ppa:fish-shell/release-4
+sudo apt-get update -q
+sudo apt-get install -y -q {{ .packages.apt | join " " }}
+
+sudo update-alternatives --set editor /usr/bin/vim.basic
+{{- end }}

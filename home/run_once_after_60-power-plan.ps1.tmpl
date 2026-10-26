@@ -1,0 +1,22 @@
+{{- if eq .chezmoi.os "windows" -}}
+$ErrorActionPreference = 'Stop'
+
+$plans = powercfg /list | ForEach-Object {
+  if ($_ -match 'GUID: ([0-9a-f-]{36})\s+\((.+?)\)') {
+    [pscustomobject]@{ Guid = $Matches[1]; Name = $Matches[2] }
+  }
+}
+
+# prefer the AMD Ryzen plan from the chipset driver, then the stock one
+$plan = $plans | Where-Object { $_.Name -match 'Ryzen.*High Performance' } | Select-Object -First 1
+if (-not $plan) {
+  $plan = $plans | Where-Object { $_.Name -eq 'High performance' } | Select-Object -First 1
+}
+
+if ($plan) {
+  Write-Host "Activating power plan: $($plan.Name)"
+  powercfg /setactive $plan.Guid
+} else {
+  Write-Warning 'No high performance power plan available on this machine'
+}
+{{- end }}

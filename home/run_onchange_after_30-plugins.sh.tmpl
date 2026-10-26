@@ -1,0 +1,25 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# plugin list hashes:
+#   fish: {{ include "dot_config/fish/fish_plugins" | sha256sum }}
+#   vim:  {{ .vim_plugins | toJson | sha256sum }}
+#   tmux: {{ include "dot_tmux.conf.tmpl" | sha256sum }}
+set -euo pipefail
+
+# fish: bootstrap fisher from a pinned release, then install plugins
+FISHER_VERSION=4.4.8
+FISHER_SHA256=0fb6c81ae3003e95b5671766fa6c25c3597066e29965b7772f6c1b007387356d
+fisher_file="$(mktemp)"
+trap 'rm -f "$fisher_file"' EXIT
+curl -fsSL "https://raw.githubusercontent.com/jorgebucaran/fisher/$FISHER_VERSION/functions/fisher.fish" -o "$fisher_file"
+echo "$FISHER_SHA256  $fisher_file" | sha256sum -c --quiet -
+fish -c "source '$fisher_file'; and fisher update"
+
+# vim: generate help tags for the plugins chezmoi installed as native packages (only doc folders that have files)
+vim -es -u NONE -i NONE -N -c 'packloadall' -c "for d in globpath(&rtp, 'doc', 0, 1) | if d =~# 'pack' && !empty(glob(d . '/*', 0, 1)) | execute 'helptags' fnameescape(d) | endif | endfor" -c 'qa!'
+
+# tmux: install plugins listed in .tmux.conf (tpm needs a running server)
+tmux new-session -d -s chezmoi-tpm "sleep 60"
+trap 'tmux kill-session -t chezmoi-tpm 2>/dev/null || true; rm -f "$fisher_file"' EXIT
+"$HOME/.tmux/plugins/tpm/bin/install_plugins"
+{{- end }}

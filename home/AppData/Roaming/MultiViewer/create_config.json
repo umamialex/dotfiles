@@ -1,0 +1,70 @@
+{
+  "migrations": [
+    "migrate-config-and-setups",
+    "windows-migrate-executable-path",
+    "move-config",
+    "move-layouts",
+    "config-deep-equal",
+    "add-indycar-timing-layout",
+    "f1tv-premium",
+    "migrate-staylive-tokens"
+  ],
+  "analyticsConsent": "denied",
+  "onboardingTutorialCompleted": true,
+  "onboardingPrecheckCompleted": true,
+  "hideDisclaimer": true,
+  "liveTimingLayouts": [
+    {
+      "id": 1,
+      "label": "Overview",
+      "type": "dynamic-grid"
+    },
+    {
+      "id": 2,
+      "label": "Race",
+      "type": "timing-table",
+      "tableColumns": [
+        "driver-tag",
+        "position-diff",
+        "team-icon",
+        "last-lap-time",
+        "best-lap-time",
+        "gap-to-leader",
+        "interval",
+        "pit-stops",
+        "tire-history",
+        "pedals"
+      ]
+    },
+    {
+      "id": 3,
+      "label": "Race",
+      "type": "indycar-timing-table",
+      "indycarTableColumns": [
+        "position",
+        "position-diff",
+        "driver-full-name",
+        "last-lap-time",
+        "best-lap-time",
+        "gap-to-leader",
+        "interval",
+        "tire-compound",
+        "tire-age"
+      ]
+    }
+  ],
+  "f1DriverRadioTranscriptionsFilterDriverNumbers": [
+    "3",
+    "12",
+    "16",
+    "44",
+    "63"
+  ],
+  "telemetryAnimateSpeed": true,
+  "telemetryAnimateSpeedometer": true,
+  "telemetryShowBestSectors": true,
+  "telemetryShowPopoutWindowDialogOnStart": false,
+  "playFromStart": true,
+  "units": "imperial",
+  "hideHomepageHero": true
+}

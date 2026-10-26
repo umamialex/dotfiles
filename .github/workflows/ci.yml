@@ -1,0 +1,296 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CHEZMOI_VERSION: 2.73.3
+  CHEZMOI_LINUX_SHA256: 6e5827598cbfc02d132b04f95b5ea10efb5b79230e2a4a0e52df4af144a8ee9f
+  CHEZMOI_WINDOWS_SHA256: e74f9948a9ac6a5d8b0c0896a9ea129a766d92e38b50b70ee1fa1dc077755d6e
+  ACTIONLINT_VERSION: 1.7.12
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+  TRUFFLEHOG_VERSION: 3.99.7
+  TRUFFLEHOG_SHA256: bdbea0508e439b144f49de14e775908de5f902f3d14ea7ae8354bae72b0b72ef
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      lint: ${{ steps.decide.outputs.lint }}
+      linux: ${{ steps.decide.outputs.linux }}
+      windows: ${{ steps.decide.outputs.windows }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Decide which jobs this change needs
+        id: decide
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          # a PR is compared with its base branch, not with the previous push, so a failure from
+          # an earlier push can't be hidden by a later push that happens to skip that job
+          base=""
+          if [ "$EVENT" = pull_request ]; then
+            base="$PR_BASE"
+          elif [ "$EVENT" = push ]; then
+            base="$PUSH_BEFORE"
+          fi
+          if [ -n "$base" ] && ! [[ "$base" =~ ^0+$ ]] && git cat-file -e "$base^{commit}"; then
+            git diff --name-only "$base" HEAD | ./scripts/ci-changes.sh | tee -a "$GITHUB_OUTPUT"
+          else
+            # scheduled runs, manual runs and new branches run everything
+            printf '%s\n' lint=true linux=true windows=true | tee -a "$GITHUB_OUTPUT"
+          fi
+
+  lint:
+    needs: changes
+    if: needs.changes.outputs.lint == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install chezmoi
+        run: |
+          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
+          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install actionlint
+        run: |
+          curl -fsSL -o actionlint.tar.gz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+          tar -xzf actionlint.tar.gz -C "$HOME/.local/bin" actionlint
+
+      - name: Lint workflows
+        run: actionlint
+
+      - name: Render templates
+        run: |
+          mkdir rendered
+          cd home
+          for f in run_*.sh.tmpl; do
+            chezmoi --source "$GITHUB_WORKSPACE" execute-template < "$f" > "../rendered/${f%.tmpl}"
+          done
+          for f in run_*.ps1.tmpl; do
+            chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data '{"chezmoi":{"os":"windows"}}' < "$f" > "../rendered/${f%.tmpl}"
+          done
+          chezmoi --source "$GITHUB_WORKSPACE" execute-template < .chezmoiexternal.toml.tmpl > ../rendered/chezmoiexternal.toml
+
+      - name: Check shell scripts
+        run: |
+          for f in rendered/*.sh scripts/*.sh; do
+            bash -n "$f"
+            shellcheck "$f"
+          done
+
+      - name: Check external config is valid TOML
+        run: python3 -c "import tomllib; tomllib.load(open('rendered/chezmoiexternal.toml', 'rb'))"
+
+      - name: Check PowerShell scripts
+        shell: pwsh
+        run: |
+          foreach ($file in Get-ChildItem rendered, scripts, home/dot_config/powershell -Filter *.ps1) {
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors)
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error "$($file.Name):$($_.Extent.StartLineNumber) $($_.Message)" }
+              exit 1
+            }
+            Write-Host "OK $($file.Name)"
+          }
+
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install trufflehog
+        run: |
+          curl -fsSL -o trufflehog.tar.gz "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_amd64.tar.gz"
+          echo "${TRUFFLEHOG_SHA256}  trufflehog.tar.gz" | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf trufflehog.tar.gz -C "$HOME/.local/bin" trufflehog
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Scan history for secrets
+        run: trufflehog git "file://$GITHUB_WORKSPACE" --no-update --results=verified,unknown --fail
+
+  linux:
+    needs: changes
+    if: needs.changes.outputs.linux == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install chezmoi
+        run: |
+          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
+          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Apply dotfiles
+        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
+
+      - name: Smoke test
+        run: |
+          set -e
+          # interactive, so config.fish activates mise like a real terminal
+          for cmd in "fish --version" "git --version" "git lfs version" "tmux -V" "vim --version" \
+                     "ag --version" "htop --version" "mise --version" "node -v" "go version" \
+                     "kubectl version --client" "helm version --short" "gh --version" "fzf --version" \
+                     "fd --version" "bat --version" "eza --version" "zoxide --version" "fisher --version" \
+                     "type -q tide" "functions -q fzf_configure_bindings" "functions -q z"; do
+            echo "+ $cmd"
+            fish -ic "$cmd" < /dev/null > /dev/null
+          done
+          # GitHub's runners ship some of these tools, so check they come from mise
+          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff; do
+            fish -ic "type -p $tool" < /dev/null | grep -q mise || { echo "$tool does not come from mise"; exit 1; }
+          done
+          fish -ic 'functions ls | string match -q "*eza*"' < /dev/null
+          fish --version | grep -q 'version 4\.'
+          fish -ic 'abbr --query k; and abbr --query dev' < /dev/null
+          fish -n "$HOME/.config/fish/config.fish"
+          test "$(git config --global user.email)" = "ci@example.com"
+          test -f "$HOME/.vim/pack/plugins/start/vim-fugitive/doc/tags"
+          vim_out="$(mktemp)"
+          vim -es -N -u "$HOME/.vimrc" -c "redir! > $vim_out" -c 'echo get(g:, "colors_name", "NONE")' -c 'echo string(map(ale#linter#Get("python"), "v:val.name"))' -c 'redir END' -c 'qa!'
+          grep -q falcon "$vim_out"
+          grep -q "'ruff'" "$vim_out"
+          test -d "$HOME/.tmux/plugins/tmux-sensible"
+
+      - name: Check idempotency
+        run: |
+          chezmoi --source "$GITHUB_WORKSPACE" apply --verbose
+          chezmoi --source "$GITHUB_WORKSPACE" verify
+
+  windows:
+    needs: changes
+    if: needs.changes.outputs.windows == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install chezmoi
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/twpayne/chezmoi/releases/download/v$env:CHEZMOI_VERSION/chezmoi_${env:CHEZMOI_VERSION}_windows_amd64.zip" -OutFile chezmoi.zip
+          if ((Get-FileHash chezmoi.zip -Algorithm SHA256).Hash.ToLower() -ne $env:CHEZMOI_WINDOWS_SHA256) { throw 'chezmoi checksum mismatch' }
+          Expand-Archive chezmoi.zip -DestinationPath "$env:RUNNER_TEMP\chezmoi"
+          "$env:RUNNER_TEMP\chezmoi" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Ensure winget
+        shell: pwsh
+        run: |
+          if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+            Install-PSResource -Name Microsoft.WinGet.Client -Repository PSGallery -TrustRepository
+            Repair-WinGetPackageManager -AllUsers
+          }
+          winget --version
+
+      - name: Apply dotfiles
+        shell: pwsh
+        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
+
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packages = (chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).packages
+          foreach ($id in $packages.winget) {
+            winget list --id $id --exact --source winget | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "$id is not installed" }
+          }
+          # drivers, services and server-only apps must be skipped in CI
+          foreach ($id in @($packages.winget_desktop) + @($packages.winget_server)) {
+            winget list --id $id --exact --source winget | Out-Null
+            if ($LASTEXITCODE -eq 0) { throw "$id should not be installed in CI" }
+          }
+          if (-not (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\SourceCodePro-Regular.ttf")) { throw 'Source Code Pro not installed' }
+          if ((Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR').AppCaptureEnabled -ne 0) { throw 'Game Bar capture still enabled' }
+          if ((Get-ItemProperty 'HKCU:\System\GameConfigStore').GameDVR_Enabled -ne 0) { throw 'GameDVR still enabled' }
+          if ((Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Power').HibernateEnabled -ne 0) { throw 'Hibernation still enabled' }
+          if ((Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive').DisableFileSyncNGSC -ne 1) { throw 'OneDrive policy not set' }
+          powercfg /getactivescheme
+          wsl --status
+          if ((git config --global user.email) -ne 'ci@example.com') { throw 'gitconfig not rendered' }
+          foreach ($path in '.vimrc', '.config\fish', '.config\mise') {
+            if (Test-Path (Join-Path $HOME $path)) { throw "$path should be ignored on Windows" }
+          }
+          if (-not (Test-Path (Join-Path $HOME '.tmux.conf'))) { throw '.tmux.conf not applied' }
+          if (-not (Test-Path (Join-Path $HOME '_vimrc'))) { throw '_vimrc not applied' }
+          # app settings are seeded only if the app hasn't created its own yet
+          $multiviewer = Get-Content "$env:APPDATA\MultiViewer\config.json" -Raw | ConvertFrom-Json
+          if ($null -ne $multiviewer.installId) { throw 'MultiViewer config should not carry an installId' }
+          $zones = (Get-Content "$env:LOCALAPPDATA\Microsoft\PowerToys\FancyZones\custom-layouts.json" -Raw | ConvertFrom-Json).'custom-layouts'
+          if ($zones.Count -ne 7) { throw "expected 7 FancyZones layouts, found $($zones.Count)" }
+          foreach ($file in 'default-layouts', 'layout-hotkeys', 'layout-templates', 'settings') {
+            Get-Content "$env:LOCALAPPDATA\Microsoft\PowerToys\FancyZones\$file.json" -Raw | ConvertFrom-Json | Out-Null
+          }
+          foreach ($plugin in 'vim-fugitive', 'ale', 'falcon', 'vim-styled-components', 'vim-jsonnet') {
+            if (-not (Test-Path (Join-Path $HOME "vimfiles\pack\plugins\start\$plugin"))) { throw "vim plugin $plugin not installed" }
+          }
+          # Vim's installer records gvim.exe's path under HKCU (per-user install) or HKLM (all users)
+          $vim = $null
+          foreach ($key in 'HKCU:\Software\Vim\Gvim', 'HKLM:\Software\Vim\Gvim', 'HKLM:\Software\WOW6432Node\Vim\Gvim') {
+            $gvim = (Get-ItemProperty $key -ErrorAction SilentlyContinue).path
+            if ($gvim) { $vim = Join-Path (Split-Path $gvim) 'vim.exe'; break }
+          }
+          if (-not $vim -or -not (Test-Path $vim)) { throw "vim.exe not found (registry says: $vim)" }
+          $vimOut = Join-Path $env:TEMP 'vim-check.txt'
+          & $vim -es -N -u (Join-Path $HOME '_vimrc') -c "redir! > $vimOut" -c 'echo get(g:, "colors_name", "NONE")' -c 'echo string(map(ale#linter#Get("python"), "v:val.name"))' -c 'redir END' -c 'qa!'
+          $vimResult = Get-Content $vimOut -Raw
+          if ($vimResult -notmatch 'falcon' -or $vimResult -notmatch 'ruff') { throw "vim config did not load: $vimResult" }
+          foreach ($path in 'Scripts\Set-ChromeBorder.ps1', 'Scripts\AutoHotkey\multimedia-control.ahk') {
+            if (-not (Test-Path (Join-Path $HOME $path))) { throw "$path not applied" }
+          }
+          if (Select-String -Path (Join-Path $HOME '.tmux.conf') -Pattern 'tpm' -Quiet) { throw 'tpm should not be in the Windows tmux config' }
+          # winget changes PATH after this job started, so reload it like a new terminal would
+          $env:PATH = [Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('PATH', 'User')
+          foreach ($tool in 'fzf', 'fd', 'bat', 'eza', 'zoxide', 'starship') {
+            if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { throw "$tool is not on PATH" }
+          }
+          foreach ($path in '.config\powershell\profile.ps1', '.config\starship.toml') {
+            if (-not (Test-Path (Join-Path $HOME $path))) { throw "$path not applied" }
+          }
+          if (-not (Get-InstalledPSResource -Name PSFzf -Version 2.7.12 -ErrorAction SilentlyContinue)) { throw 'PSFzf is not installed' }
+          if (-not (Get-Content $PROFILE.CurrentUserCurrentHost -Raw).Contains('.config\powershell\profile.ps1')) { throw 'profile stub missing' }
+          # a fresh pwsh loads the real profile through the stub
+          $loaded = pwsh -NoLogo -Command '(Get-Command ls).CommandType; (Get-Command dev).CommandType; [bool](Get-Command z); [bool](Get-Command prompt)'
+          if (($loaded -join ' ') -ne 'Function Function True True') { throw "profile did not load: $($loaded -join ' ')" }
+
+      - name: Check idempotency
+        shell: pwsh
+        run: |
+          chezmoi --source "$env:GITHUB_WORKSPACE" apply --verbose
+          chezmoi --source "$env:GITHUB_WORKSPACE" verify

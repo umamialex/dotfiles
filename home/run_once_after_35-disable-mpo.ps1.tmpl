@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "windows" -}}
+#Requires -RunAsAdministrator
+$ErrorActionPreference = 'Stop'
+
+# Multiplane Overlay presentation stalls freeze every Chrome window when several video
+# streams are open on NVIDIA GPUs. OverlayTestMode = 5 turns MPO off (restart required).
+if (-not (Get-CimInstance Win32_VideoController | Where-Object { $_.Name -match 'NVIDIA' })) {
+  Write-Host 'No NVIDIA GPU found, leaving Multiplane Overlay enabled'
+  return
+}
+
+$dwm = 'HKLM:\SOFTWARE\Microsoft\Windows\Dwm'
+if (-not (Test-Path $dwm)) { New-Item -Path $dwm | Out-Null }
+Set-ItemProperty -Path $dwm -Name 'OverlayTestMode' -Value 5 -Type DWord
+Write-Host 'Disabled Multiplane Overlay (restart required)'
+{{- end }}

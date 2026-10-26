@@ -1,0 +1,15 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+set -euo pipefail
+
+fish_path="$(command -v fish)"
+# chsh prompts for a password, so skip it in CI
+if [ "${CI:-}" != "true" ] && [ "$(getent passwd "$USER" | cut -d: -f7)" != "$fish_path" ]; then
+  chsh -s "$fish_path"
+fi
+
+# drop the old "fish; exit" workaround from .bashrc
+if [ -f "$HOME/.bashrc" ]; then
+  sed -i '/^fish; exit$/d' "$HOME/.bashrc"
+fi
+{{- end }}

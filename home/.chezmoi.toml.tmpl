@@ -1,0 +1,14 @@
+{{- $name := promptStringOnce . "name" "Name" "Alex Martin" -}}
+{{- $email := promptStringOnce . "email" "Email" "alex@umamialex.com" -}}
+{{- $server := promptBoolOnce . "server" "Home server" false -}}
+
+[data]
+  name = {{ $name | quote }}
+  email = {{ $email | quote }}
+  server = {{ $server }}
+{{- if eq .chezmoi.os "windows" }}
+
+[interpreters.ps1]
+  command = "pwsh"
+  args = ["-NoLogo", "-ExecutionPolicy", "Bypass", "-File"]
+{{- end }}

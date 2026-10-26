@@ -1,2 +1,7 @@
 env.fish
 nodesource_setup.sh
+
+# backups: only plaintext files that were reviewed for secrets and approved by name
+backups/*
+!backups/ffz-settings.json
+!backups/multiviewer-setups.json

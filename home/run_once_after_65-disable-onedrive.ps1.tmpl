@@ -1,0 +1,10 @@
+{{- if eq .chezmoi.os "windows" -}}
+#Requires -RunAsAdministrator
+$ErrorActionPreference = 'Stop'
+
+# Policy "Prevent the usage of OneDrive for file storage": the sync client can't run, so Windows
+# stops offering it and can't redirect Desktop, Documents or Pictures into it.
+$key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive'
+New-Item -Path $key -Force | Out-Null
+Set-ItemProperty -Path $key -Name 'DisableFileSyncNGSC' -Value 1 -Type DWord
+{{- end }}

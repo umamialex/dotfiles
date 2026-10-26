@@ -1,0 +1,21 @@
+{{- if eq .chezmoi.os "windows" -}}
+# multimedia-control.ahk hash: {{ include "Scripts/AutoHotkey/multimedia-control.ahk" | sha256sum }}
+$ErrorActionPreference = 'Stop'
+
+# Runs the display/audio hotkeys at sign-in, straight from the AutoHotkey v2 interpreter.
+$ahk = Join-Path $env:ProgramFiles 'AutoHotkey\v2\AutoHotkey64.exe'
+if (-not (Test-Path $ahk)) {
+  Write-Warning "AutoHotkey v2 not found at $ahk, skipping the startup shortcut"
+  return
+}
+
+$script = Join-Path $HOME 'Scripts\AutoHotkey\multimedia-control.ahk'
+$shortcut = Join-Path ([Environment]::GetFolderPath('Startup')) 'multimedia-control.lnk'
+
+$link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
+$link.TargetPath = $ahk
+$link.Arguments = "`"$script`""
+$link.WorkingDirectory = Split-Path $script
+$link.Save()
+Write-Host "Created startup shortcut $shortcut"
+{{- end }}
