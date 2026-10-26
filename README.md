@@ -36,6 +36,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
     * Disables hibernation and sets the high performance power plan
     * Disables the OneDrive sync client with a policy
+    * Installs Vim from winget (9.2) with the same config as Linux (`~/_vimrc` and `~/vimfiles`)
     * Sets up the PowerShell 7 profile (`~/.config/powershell/profile.ps1`, loaded through a stub at your real `$PROFILE`):
       history suggestions, `eza` for `ls`, `zoxide`, fzf key bindings (PSFzf), a starship prompt, and the `dev`, `p`, `g` shortcuts
     * Disables Multiplane Overlay on NVIDIA GPUs (fixes Chrome freezing with several video streams, needs a restart)
@@ -70,7 +71,8 @@ Open Ubuntu, then:
 ```
 
 This installs the apt packages, [mise](https://mise.jdx.dev) tools (node, go, kubectl, helm, gh, trufflehog, fzf, fd, bat, eza, zoxide),
-the fish/vim/tmux plugins, and sets fish as the login shell.
+the fish and tmux plugins, the Vim plugins (native packages, pinned by commit), and sets fish as the login shell.
+Vim itself comes from apt, so it is Ubuntu's version (9.1); Windows gets the newer one from winget.
 
 ## Day to day
 
@@ -94,6 +96,7 @@ and `run_once_*` scripts run once per machine.
 | `home/run_*` | install scripts for Linux (`.sh`) and Windows (`.ps1`) |
 | `home/Scripts/` | Windows-only scripts: Chrome border watcher and AutoHotkey hotkeys |
 | `home/dot_config/mise/config.toml` | global tool versions |
+| `home/.chezmoitemplates/vimrc` | the vimrc for both OSes (`~/.vimrc` on Linux, `~/_vimrc` on Windows); plugins are pinned in `home/.chezmoidata/vim.yaml` |
 | `home/dot_config/powershell/profile.ps1` | shared PowerShell 7 profile, with a starship prompt config in `home/dot_config/starship.toml` |
 | `scripts/audit-packages.*` | lists installed packages that aren't in `packages.yaml`, and the reverse (see below) |
 | `windows/wsl-firewall.ps1` | forwards WSL ports, used by the `fw` alias |
@@ -125,6 +128,7 @@ and fails on verified or unverifiable secrets. To scan locally (mise installs `t
 
 * **mise:** the binary is pinned in `home/.chezmoiexternal.toml.tmpl`. To bump it, update
   the version and the sha256 checksums from the release's `SHASUMS256.txt`.
+* **Vim plugins:** pinned by commit in `home/.chezmoidata/vim.yaml`. To update one, change its commit; chezmoi downloads it and regenerates the help tags.
 * **fisher:** pinned by version and sha256 in `home/run_onchange_after_30-plugins.sh.tmpl`.
 * **chezmoi in CI:** pinned by version and sha256 in `.github/workflows/ci.yml`.
 * **Actions:** pinned by commit SHA, updated weekly by Dependabot.
