@@ -115,22 +115,17 @@ Each prints packages that are installed but not tracked, and tracked packages th
 Runtimes and system packages are skipped through `packages.audit_ignore`.
 `chezmoi unmanaged <dir>` does the same for files.
 
-## Encrypted backups
+## Backups
 
-Settings that live inside an app (for example FrankerFaceZ in Chrome) can be backed up as an
-[age](https://github.com/FiloSottile/age)-encrypted file in `backups/`. The repo is public, so
-it uses a key pair, not a password. `.gitignore` only lets `backups/*.age` through, plus
-`backups/ffz-settings.json`, which was reviewed and has no secrets (it is plain text on purpose).
-
-```
-> age-keygen -o ~/.config/age/key.txt                 # once; keep the private key in a password manager
-> age -r <public key> -o backups/ffz-settings.json.age ffz-settings.json   # encrypt, then delete the JSON
-> age -d -i ~/.config/age/key.txt -o ffz-settings.json backups/ffz-settings.json.age   # decrypt
-```
+Settings that live inside an app (for example FrankerFaceZ in Chrome) can be exported into
+`backups/`. The repo is public, so `.gitignore` blocks everything in `backups/` except files that
+were reviewed for secrets and approved by name (currently `ffz-settings.json`). If a future export
+does contain secrets, encrypt it with [age](https://github.com/FiloSottile/age) and not with this
+allow list; age isn't installed by this repo because nothing needs it today.
 
 For FrankerFaceZ: twitch.tv, FFZ Control Center, Data Management, Backup and Restore. Restoring
 is manual, through the same screen: choose `backups/ffz-settings.json` there. To refresh the
-backup, export again and overwrite the file. `age` is installed by mise on Linux and by winget on Windows.
+backup, export again and overwrite the file.
 
 ## Secret scanning
 
