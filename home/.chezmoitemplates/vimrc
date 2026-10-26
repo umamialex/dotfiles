@@ -1,0 +1,65 @@
+" Shared by ~/.vimrc (Linux) and ~/_vimrc (Windows), see dot_vimrc.tmpl and _vimrc.tmpl.
+" Plugins are native packages in pack/plugins/start, installed and pinned by chezmoi
+" (home/.chezmoidata/vim.yaml), so there is no plugin manager here.
+
+" Vim's own defaults (incsearch, scrolloff, wildmenu, showcmd, backspace, cursor restore, ...)
+unlet! skip_defaults_vim
+source $VIMRUNTIME/defaults.vim
+
+if !has('win32')
+  " fish is the login shell, but plugins expect a POSIX shell
+  set shell=/bin/bash
+endif
+
+if has('termguicolors')
+  " consoles without 24-bit color (E954) just keep the 256-color theme
+  silent! set termguicolors
+endif
+set background=dark
+silent! colorscheme falcon
+
+set autoindent
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+set expandtab
+set relativenumber
+set colorcolumn=80
+set hlsearch
+set ignorecase
+set smartcase
+set hidden
+set viminfo='100,<500,s10,h
+
+" keep undo history across restarts
+if has('persistent_undo')
+  let s:undodir = (has('win32') ? expand('~/vimfiles') : expand('~/.vim')) . '/undo'
+  if !isdirectory(s:undodir)
+    call mkdir(s:undodir, 'p')
+  endif
+  let &undodir = s:undodir
+  set undofile
+endif
+
+" ALE: stylelint also runs on styled-components in JS and TS files
+let g:ale_linter_aliases = {
+\   'javascript': ['css', 'javascript'],
+\   'javascriptreact': ['css', 'javascript'],
+\   'typescript': ['css', 'javascript'],
+\   'typescriptreact': ['css', 'javascript'],
+\ }
+" g:ale_linters is a dictionary keyed by the buffer's filetype (only b:ale_linters takes a list)
+let g:ale_linters = {
+\   'python': ['ruff'],
+\   'javascript': ['eslint', 'stylelint'],
+\   'javascriptreact': ['eslint', 'stylelint'],
+\   'typescript': ['eslint', 'stylelint'],
+\   'typescriptreact': ['eslint', 'stylelint'],
+\   'css': ['stylelint'],
+\   'yaml': ['yamllint'],
+\ }
+
+augroup vimrc
+  autocmd!
+  autocmd FileType java setlocal shiftwidth=4 softtabstop=4 expandtab
+augroup END
