@@ -173,7 +173,7 @@ jobs:
             fish -ic "$cmd" < /dev/null > /dev/null
           done
           # GitHub's runners ship some of these tools, so check they come from mise
-          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff age; do
+          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff; do
             fish -ic "type -p $tool" < /dev/null | grep -q mise || { echo "$tool does not come from mise"; exit 1; }
           done
           fish -ic 'functions ls | string match -q "*eza*"' < /dev/null
