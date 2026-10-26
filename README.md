@@ -119,7 +119,8 @@ Runtimes and system packages are skipped through `packages.audit_ignore`.
 
 Settings that live inside an app (for example FrankerFaceZ in Chrome) can be backed up as an
 [age](https://github.com/FiloSottile/age)-encrypted file in `backups/`. The repo is public, so
-it uses a key pair, not a password. `.gitignore` only lets `backups/*.age` through.
+it uses a key pair, not a password. `.gitignore` only lets `backups/*.age` through, plus
+`backups/ffz-settings.json`, which was reviewed and has no secrets (it is plain text on purpose).
 
 ```
 > age-keygen -o ~/.config/age/key.txt                 # once; keep the private key in a password manager
@@ -128,7 +129,8 @@ it uses a key pair, not a password. `.gitignore` only lets `backups/*.age` throu
 ```
 
 For FrankerFaceZ: twitch.tv, FFZ Control Center, Data Management, Backup and Restore. Restoring
-is manual, through the same screen. `age` is installed by mise on Linux and by winget on Windows.
+is manual, through the same screen: choose `backups/ffz-settings.json` there. To refresh the
+backup, export again and overwrite the file. `age` is installed by mise on Linux and by winget on Windows.
 
 ## Secret scanning
 
