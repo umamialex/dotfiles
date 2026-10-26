@@ -41,3 +41,7 @@ foreach ($id in $tracked) {
   winget list --id $id --exact --source winget --accept-source-agreements | Out-Null
   if ($LASTEXITCODE -ne 0) { Write-Host "  $id" }
 }
+foreach ($id in @($packages.winget_store)) {
+  winget list --id $id --exact --source msstore --accept-source-agreements | Out-Null
+  if ($LASTEXITCODE -ne 0) { Write-Host "  $id (Microsoft Store)" }
+}
