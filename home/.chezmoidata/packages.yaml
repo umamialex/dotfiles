@@ -1,0 +1,15 @@
+packages:
+  apt:
+    - build-essential
+    - ca-certificates
+    - curl
+    - fish
+    - git
+    - git-lfs
+    - gnupg2
+    - htop
+    - silversearcher-ag
+    - software-properties-common
+    - tmux
+    - unzip
+    - vim
