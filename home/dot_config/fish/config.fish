@@ -2,46 +2,15 @@ alias vi="vim"
 alias ls="ls -laX --color"
 alias dev="cd ~/Development"
 alias p="dev; and cd personal"
-alias agg="dev; and cd athletesgg"
 alias grafana="dev; and cd grafana"
 alias g="grafana"
-alias tapi="tmux a -t agg-ms-api"
-alias tapp="tmux a -t agg-app"
 alias e="explorer.exe ."
 alias k="kubectl"
 alias fw="powershell.exe ~/Development/personal/dotfiles/windows/wsl-firewall.ps1"
 alias s="fw && sudo service ssh start"
 
-setenv JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-setenv ANDROID_HOME /home/suitupalex/Android
-setenv SSH_ENV $HOME/.ssh/environment
-setenv DOCKER_HOST unix:///var/run/docker.sock
-set PATH (yarn global bin) $JAVA_HOME/bin ~/.local/bin /usr/local/go/bin ~/go/bin $PATH
-
-setenv DEBUG "agg:*"
-setenv API_VERSION v0
-setenv COOKIE_DOMAIN localhost
-setenv SOCKET_URL http://localhost:8080
-setenv UPDATE_INTERVAL 10
-setenv AGG_JWT_AUDIENCE http://localhost:8080
-setenv AGG_SUCCESS_REDIRECT http://localhost:8080/profile/settings
-setenv AGG_DB_URL mongodb://localhost:27017
-setenv AGG_CONTENTFUL_FETCH_INTERVAL 900
+set -gx PATH ~/.local/bin ~/go/bin $PATH
 
 if test -e ~/.config/fish/env.fish
-  . ~/.config/fish/env.fish
+  source ~/.config/fish/env.fish
 end
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-if test -f /home/umamialex/miniconda3/bin/conda
-    eval /home/umamialex/miniconda3/bin/conda "shell.fish" "hook" $argv | source
-else
-    if test -f "/home/umamialex/miniconda3/etc/fish/conf.d/conda.fish"
-        . "/home/umamialex/miniconda3/etc/fish/conf.d/conda.fish"
-    else
-        set -x PATH "/home/umamialex/miniconda3/bin" $PATH
-    end
-end
-# <<< conda initialize <<<
-
