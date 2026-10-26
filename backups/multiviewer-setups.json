@@ -1,0 +1,254 @@
+{
+  "$schema": "./setups.schema.json",
+  "version": 1,
+  "setups": [
+    {
+      "id": "a3ce51ec-9c34-43a7-9c27-97ca899f7027",
+      "insertedAt": "2026-07-04T15:42:32.115Z",
+      "name": "Skippy",
+      "displays": [
+        {
+          "id": 3800140834,
+          "label": "QCQ95S",
+          "colorDepth": 24,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1440
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1440
+          },
+          "scaleFactor": 1.5,
+          "rotation": 0,
+          "touchSupport": "unknown"
+        }
+      ],
+      "windows": [
+        {
+          "id": 2,
+          "type": "f1tv.player",
+          "state": {
+            "streamData": {
+              "manifestV2": true,
+              "title": "LEC",
+              "contentId": "1000010311",
+              "meetingKey": "1290",
+              "sessionKey": "11330",
+              "channelId": 1008,
+              "type": "obc",
+              "sessionType": "quali"
+            },
+            "driverData": {
+              "driverNumber": 16,
+              "firstName": "Charles",
+              "lastName": "Leclerc",
+              "teamName": "Ferrari",
+              "tla": "LEC"
+            },
+            "playerState": {
+              "muted": true,
+              "volume": 100
+            },
+            "speedometerEnabled": true
+          },
+          "windowState": {
+            "bounds": {
+              "x": 1706,
+              "y": 480,
+              "width": 854,
+              "height": 480
+            },
+            "isMaximized": false,
+            "isFullScreen": false,
+            "isAlwaysOnTop": false,
+            "displayId": 3800140834,
+            "maintainAspectRatio": true
+          }
+        },
+        {
+          "id": 8,
+          "type": "f1tv.player",
+          "state": {
+            "streamData": {
+              "manifestV2": true,
+              "title": "F1 LIVE",
+              "contentId": "1000010311",
+              "meetingKey": "1290",
+              "sessionKey": "11330",
+              "channelId": 1033,
+              "type": "additional",
+              "sessionType": "quali"
+            },
+            "playerState": {
+              "muted": false,
+              "volume": 100
+            }
+          },
+          "windowState": {
+            "bounds": {
+              "x": 0,
+              "y": 480,
+              "width": 1707,
+              "height": 960
+            },
+            "isMaximized": false,
+            "isFullScreen": false,
+            "isAlwaysOnTop": false,
+            "displayId": 3800140834,
+            "maintainAspectRatio": true
+          }
+        },
+        {
+          "id": 7,
+          "type": "f1tv.player",
+          "state": {
+            "streamData": {
+              "manifestV2": true,
+              "title": "HAM",
+              "contentId": "1000010311",
+              "meetingKey": "1290",
+              "sessionKey": "11330",
+              "channelId": 1007,
+              "type": "obc",
+              "sessionType": "quali"
+            },
+            "driverData": {
+              "driverNumber": 44,
+              "firstName": "Lewis",
+              "lastName": "Hamilton",
+              "teamName": "Ferrari",
+              "tla": "HAM"
+            },
+            "playerState": {
+              "muted": true,
+              "volume": 100
+            },
+            "speedometerEnabled": true
+          },
+          "windowState": {
+            "bounds": {
+              "x": 1702,
+              "y": 0,
+              "width": 858,
+              "height": 482
+            },
+            "isMaximized": false,
+            "isFullScreen": false,
+            "isAlwaysOnTop": false,
+            "displayId": 3800140834,
+            "maintainAspectRatio": true
+          }
+        },
+        {
+          "id": 6,
+          "type": "f1tv.player",
+          "state": {
+            "streamData": {
+              "manifestV2": true,
+              "title": "ANT",
+              "contentId": "1000010311",
+              "meetingKey": "1290",
+              "sessionKey": "11330",
+              "channelId": 1010,
+              "type": "obc",
+              "sessionType": "quali"
+            },
+            "driverData": {
+              "driverNumber": 12,
+              "firstName": "Andrea Kimi",
+              "lastName": "Antonelli",
+              "teamName": "Mercedes",
+              "tla": "ANT"
+            },
+            "playerState": {
+              "muted": true,
+              "volume": 100
+            },
+            "speedometerEnabled": true
+          },
+          "windowState": {
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 854,
+              "height": 480
+            },
+            "isMaximized": false,
+            "isFullScreen": false,
+            "isAlwaysOnTop": false,
+            "displayId": 3800140834,
+            "maintainAspectRatio": true
+          }
+        },
+        {
+          "id": 5,
+          "type": "f1.live-timing.index",
+          "state": {
+            "activeLiveTimingLayoutId": 2
+          },
+          "windowState": {
+            "bounds": {
+              "x": 1700,
+              "y": 0,
+              "width": 866,
+              "height": 1446
+            },
+            "isMaximized": false,
+            "isFullScreen": false,
+            "isAlwaysOnTop": false,
+            "displayId": 3800140834,
+            "maintainAspectRatio": false
+          }
+        },
+        {
+          "id": 4,
+          "type": "f1tv.player",
+          "state": {
+            "streamData": {
+              "manifestV2": true,
+              "title": "VER",
+              "contentId": "1000010311",
+              "meetingKey": "1290",
+              "sessionKey": "11330",
+              "channelId": 1009,
+              "type": "obc",
+              "sessionType": "quali"
+            },
+            "driverData": {
+              "driverNumber": 3,
+              "firstName": "Max",
+              "lastName": "Verstappen",
+              "teamName": "Red Bull Racing",
+              "tla": "VER"
+            },
+            "playerState": {
+              "muted": true,
+              "volume": 100
+            },
+            "speedometerEnabled": true
+          },
+          "windowState": {
+            "bounds": {
+              "x": 852,
+              "y": 0,
+              "width": 854,
+              "height": 480
+            },
+            "isMaximized": false,
+            "isFullScreen": false,
+            "isAlwaysOnTop": false,
+            "displayId": 3800140834,
+            "maintainAspectRatio": true
+          }
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-07-18T14:21:53.848Z"
+    }
+  ]
+}
