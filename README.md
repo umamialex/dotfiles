@@ -66,7 +66,7 @@ Open Ubuntu, then:
 > sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply umamialex
 ```
 
-This installs the apt packages, [mise](https://mise.jdx.dev) tools (node, go, kubectl, helm, gh, trufflehog),
+This installs the apt packages, [mise](https://mise.jdx.dev) tools (node, go, kubectl, helm, gh, trufflehog, fzf, fd, bat, eza, zoxide),
 the fish/vim/tmux plugins, and sets fish as the login shell.
 
 ## Day to day
