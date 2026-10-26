@@ -36,7 +36,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
     * Disables hibernation and sets the high performance power plan
     * Disables the OneDrive sync client with a policy
-    * Seeds MultiViewer preferences and FancyZones layouts, hotkeys and settings, only when the app hasn't created its own files yet
+    * Seeds MultiViewer preferences, FancyZones layouts, hotkeys and settings, and Windows Terminal keybindings, only when the app hasn't created its own files yet
     * Installs Vim from winget (9.2) with the same config as Linux (`~/_vimrc` and `~/vimfiles`)
     * Sets up the PowerShell 7 profile (`~/.config/powershell/profile.ps1`, loaded through a stub at your real `$PROFILE`):
       history suggestions, `eza` for `ls`, `zoxide`, fzf key bindings (PSFzf), a starship prompt, and the `dev`, `p`, `g` shortcuts
@@ -98,7 +98,7 @@ and `run_once_*` scripts run once per machine.
 | `home/Scripts/` | Windows-only scripts: Chrome border watcher and AutoHotkey hotkeys |
 | `home/dot_config/mise/config.toml` | global tool versions |
 | `home/.chezmoitemplates/vimrc` | the vimrc for both OSes (`~/.vimrc` on Linux, `~/_vimrc` on Windows); plugins are pinned in `home/.chezmoidata/vim.yaml` |
-| `home/AppData/` | app settings seeded on Windows with `create_` files, which chezmoi writes only if the file is missing (MultiViewer, FancyZones) |
+| `home/AppData/` | app settings seeded on Windows with `create_` files, which chezmoi writes only if the file is missing (MultiViewer, FancyZones, Windows Terminal) |
 | `home/dot_config/powershell/profile.ps1` | shared PowerShell 7 profile, with a starship prompt config in `home/dot_config/starship.toml` |
 | `scripts/audit-packages.*` | lists installed packages that aren't in `packages.yaml`, and the reverse (see below) |
 | `windows/wsl-firewall.ps1` | forwards WSL ports, used by the `fw` alias |

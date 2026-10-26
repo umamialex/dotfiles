@@ -257,6 +257,7 @@ jobs:
           foreach ($file in 'default-layouts', 'layout-hotkeys', 'layout-templates', 'settings') {
             Get-Content "$env:LOCALAPPDATA\Microsoft\PowerToys\FancyZones\$file.json" -Raw | ConvertFrom-Json | Out-Null
           }
+          Get-Content "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" -Raw | ConvertFrom-Json | Out-Null
           foreach ($plugin in 'vim-fugitive', 'ale', 'falcon', 'vim-styled-components', 'vim-jsonnet') {
             if (-not (Test-Path (Join-Path $HOME "vimfiles\pack\plugins\start\$plugin"))) { throw "vim plugin $plugin not installed" }
           }
