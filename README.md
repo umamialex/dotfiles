@@ -19,11 +19,6 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
 1. Disable Cortana
 1. Disable UAC
 1. Download and install Windows updates
-1. Update Powershell execution policy
-    * Run Powershell as administrator
-    ```
-    > Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-    ```
 1. Install chezmoi and apply the dotfiles (usually requires restart)
     * Run Powershell as administrator
     ```
@@ -34,6 +29,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Removes bloatware (`packages.appx_remove`) and disables Xbox Game Bar
     * Disables hibernation and sets the high performance power plan
     * Installs WSL 2, Ubuntu, and the `Source Code Pro` font
+    * `.ps1` scripts run with `powershell -ExecutionPolicy Bypass`, so no execution policy change is needed
 1. Update all motherboard drivers
 1. Update graphics card drivers and settings
     * [GeForce Experience](https://www.nvidia.com/en-us/geforce/geforce-experience/)
@@ -43,12 +39,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     * Disable `Reward is available` desktop notification
     * Enable `Automatically download driver updates...`
 1. Update monitor refresh rate
-1. Install [WSLtty](https://github.com/mintty/wsltty/releases)
-1. Set WSLtty shortcut to always run as administrator
-    * Search `WSL Terminal` in start menu
-    * Open file location
-    * Right click -> Properties -> Compatibility -> Run this program as administrator
-1. Update WSLtty font to `Source Code Pro` and set to medium weight
+1. Set the Windows Terminal font to `Source Code Pro` and set to medium weight
 1. Disable extraneous audio devices
 
 ### 3. Ubuntu (WSL)
