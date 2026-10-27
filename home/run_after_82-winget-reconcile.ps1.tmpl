@@ -1,6 +1,6 @@
 {{- if eq .chezmoi.os "windows" -}}
-{{- $ids := includeTemplate "winget-ids" . | splitList "\n" | compact -}}
-{{- $store := includeTemplate "winget-store-ids" . | splitList "\n" | compact -}}
+{{- $ids := regexSplit "\\s+" (includeTemplate "winget-ids" . | trim) -1 | compact -}}
+{{- $store := regexSplit "\\s+" (includeTemplate "winget-store-ids" . | trim) -1 | compact -}}
 $ErrorActionPreference = 'Stop'
 
 # Finds winget packages installed here that packages.yaml doesn't track, and asks what to do with

@@ -221,6 +221,8 @@ jobs:
           test -d "$HOME/.tmux/plugins/tmux-sensible"
           # the pre-commit hook is wired up, and blocks a commit when trufflehog is missing
           test -x "$HOME/.config/git/hooks/pre-commit"
+          # the tilde is meant literally: the config value is expanded by git, not the shell
+          # shellcheck disable=SC2088
           test "$(git config --global core.hooksPath)" = "~/.config/git/hooks"
           repo="$(mktemp -d)"
           git -C "$repo" init -q
@@ -234,7 +236,8 @@ jobs:
       - name: Check idempotency
         run: |
           chezmoi --source "$GITHUB_WORKSPACE" apply --verbose
-          chezmoi --source "$GITHUB_WORKSPACE" verify
+          # scripts that run on every apply always count as pending, so only files are verified
+          chezmoi --source "$GITHUB_WORKSPACE" verify --exclude scripts
 
   windows:
     needs: changes
@@ -280,7 +283,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $packages = (chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).packages
           # the expected set comes from the same template the install script uses
-          $expected = @('{{ includeTemplate "winget-ids" . }}' | chezmoi --source "$env:GITHUB_WORKSPACE" execute-template) | Where-Object { $_ }
+          $expected = @('{{ includeTemplate "winget-ids" . }}' | chezmoi --source "$env:GITHUB_WORKSPACE" execute-template) | ForEach-Object { $_.Trim() } | Where-Object { $_ }
           if ($expected.Count -ne @($packages.winget).Count) { throw "CI should only install the base winget list, got: $($expected -join ', ')" }
           foreach ($id in $expected) {
             winget list --id $id --exact --source winget | Out-Null
@@ -365,4 +368,5 @@ jobs:
         shell: pwsh
         run: |
           chezmoi --source "$env:GITHUB_WORKSPACE" apply --verbose
-          chezmoi --source "$env:GITHUB_WORKSPACE" verify
+          # scripts that run on every apply always count as pending, so only files are verified
+          chezmoi --source "$env:GITHUB_WORKSPACE" verify --exclude scripts

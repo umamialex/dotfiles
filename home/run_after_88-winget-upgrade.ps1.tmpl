@@ -1,6 +1,6 @@
 {{- if and (eq .chezmoi.os "windows") (ne (env "CI") "true") -}}
-{{- $ids := includeTemplate "winget-ids" . | splitList "\n" | compact -}}
-{{- $store := includeTemplate "winget-store-ids" . | splitList "\n" | compact -}}
+{{- $ids := regexSplit "\\s+" (includeTemplate "winget-ids" . | trim) -1 | compact -}}
+{{- $store := regexSplit "\\s+" (includeTemplate "winget-store-ids" . | trim) -1 | compact -}}
 $ErrorActionPreference = 'Stop'
 
 # Upgrades the packages this machine tracks, on every apply. An app that is open or fails to

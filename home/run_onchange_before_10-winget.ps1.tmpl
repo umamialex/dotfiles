@@ -1,6 +1,6 @@
 {{- if eq .chezmoi.os "windows" -}}
-{{- $ids := includeTemplate "winget-ids" . | splitList "\n" | compact -}}
-{{- $store := includeTemplate "winget-store-ids" . | splitList "\n" | compact -}}
+{{- $ids := regexSplit "\\s+" (includeTemplate "winget-ids" . | trim) -1 | compact -}}
+{{- $store := regexSplit "\\s+" (includeTemplate "winget-store-ids" . | trim) -1 | compact -}}
 # winget packages hash: {{ concat $ids $store | toJson | sha256sum }}
 $ErrorActionPreference = 'Stop'
 

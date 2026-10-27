@@ -18,7 +18,7 @@ $packages = $data.packages
 
 # chezmoi reads the template from stdin, because quotes in a native command argument get lost in PowerShell
 function Get-Rendered($name) {
-  @("{{ includeTemplate `"$name`" . }}" | chezmoi --source $root execute-template) | Where-Object { $_ }
+  @("{{ includeTemplate `"$name`" . }}" | chezmoi --source $root execute-template) | ForEach-Object { $_.Trim() } | Where-Object { $_ }
 }
 
 $tracked = @(Get-Rendered 'winget-ids')
