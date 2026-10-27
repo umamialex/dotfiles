@@ -354,7 +354,8 @@ jobs:
           if (($loaded -join ' ') -ne 'Function Function True True') { throw "profile did not load: $($loaded -join ' ')" }
           # the pinned trufflehog is installed, and the pre-commit hook runs under Git for Windows
           $trufflehog = Join-Path $HOME '.local\bin\trufflehog.exe'
-          $pinned = (chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).packages.trufflehog.version
+          # chezmoi is no longer on PATH after the reload above, so use the data read at the top of this step
+          $pinned = $packages.trufflehog.version
           if ((& $trufflehog --version 2>&1 | Out-String) -notmatch [regex]::Escape($pinned)) { throw "trufflehog $pinned is not installed" }
           if (-not (Test-Path (Join-Path $HOME '.config\git\hooks\pre-commit'))) { throw 'pre-commit hook not applied' }
           $repo = Join-Path $env:RUNNER_TEMP 'hook-test'
