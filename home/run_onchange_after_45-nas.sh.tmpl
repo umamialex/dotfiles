@@ -1,0 +1,38 @@
+{{- $work := and (hasKey . "work") .work -}}
+{{- $nas := "" -}}
+{{- if hasKey . "nas_host" -}}
+{{-   $nas = .nas_host -}}
+{{- end -}}
+{{- if and (eq .chezmoi.os "linux") (not $work) $nas -}}
+#!/bin/bash
+# NAS host: {{ $nas }}
+set -euo pipefail
+
+# Mounts the NAS share in WSL when Windows doesn't map it as G:. The credentials come from
+# Windows, so this never stores a password.
+nas='{{ $nas }}'
+mount_point=/mnt/gdrive
+
+# drvfs only exists in WSL
+if ! grep -qi microsoft /proc/version; then
+  exit 0
+fi
+# a G: mapping in Windows shows up at /mnt/g by itself
+if mountpoint -q /mnt/g 2> /dev/null; then
+  exit 0
+fi
+if grep -qs "$mount_point" /etc/fstab; then
+  exit 0
+fi
+
+# skip when the NAS is out of reach, such as away from home
+if ! timeout 3 bash -c "exec 3<>/dev/tcp/$nas/445" 2> /dev/null; then
+  echo "$nas did not answer on port 445, skipping the NAS mount" >&2
+  exit 0
+fi
+
+line="\\\\${nas}\\Google\\040Drive $mount_point drvfs uid=$(id -u),gid=$(id -g),nofail 0 0"
+sudo mkdir -p "$mount_point"
+printf '%s\n' "$line" | sudo tee -a /etc/fstab > /dev/null
+sudo mount "$mount_point" || echo "could not mount $mount_point yet, check the NAS credentials in Windows" >&2
+{{- end }}

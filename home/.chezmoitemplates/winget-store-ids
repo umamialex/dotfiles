@@ -1,0 +1,6 @@
+{{- /* Microsoft Store package ids for this machine, one per line. Skipped in CI. */ -}}
+{{- if ne (env "CI") "true" -}}
+{{-   range .packages.winget_store }}
+{{ . }}
+{{-   end }}
+{{- end }}

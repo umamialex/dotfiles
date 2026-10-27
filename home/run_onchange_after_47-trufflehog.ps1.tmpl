@@ -1,0 +1,41 @@
+{{- if eq .chezmoi.os "windows" -}}
+{{- $pin := .packages.trufflehog -}}
+# trufflehog {{ $pin.version }} {{ $pin.windows_amd64_sha256 }}
+$ErrorActionPreference = 'Stop'
+
+# Installs trufflehog for the pre-commit hook. winget has no package, so this downloads the official
+# release and installs it only if its sha256 matches the pin in packages.yaml.
+$version = '{{ $pin.version }}'
+$sha256 = '{{ $pin.windows_amd64_sha256 }}'
+$bin = Join-Path $HOME '.local\bin'
+$exe = Join-Path $bin 'trufflehog.exe'
+
+if (Test-Path $exe) {
+  $installed = & $exe --version 2>&1 | Out-String
+  if ($installed -match [regex]::Escape($version)) {
+    Write-Host "trufflehog $version already installed"
+    return
+  }
+}
+
+$archive = "trufflehog_${version}_windows_amd64.tar.gz"
+$temp = Join-Path ([IO.Path]::GetTempPath()) "trufflehog-$PID"
+New-Item -ItemType Directory -Path $temp | Out-Null
+try {
+  $file = Join-Path $temp $archive
+  Invoke-WebRequest -Uri "https://github.com/trufflesecurity/trufflehog/releases/download/v$version/$archive" -OutFile $file
+  if ((Get-FileHash $file -Algorithm SHA256).Hash.ToLower() -ne $sha256) {
+    throw "trufflehog checksum mismatch for $archive, not installing it"
+  }
+
+  # Windows ships tar.exe
+  tar -xzf $file -C $temp trufflehog.exe
+  if ($LASTEXITCODE -ne 0) { throw "tar failed to extract $archive (exit code $LASTEXITCODE)" }
+
+  New-Item -ItemType Directory -Path $bin -Force | Out-Null
+  Copy-Item (Join-Path $temp 'trufflehog.exe') $exe -Force
+  Write-Host "Installed trufflehog $version to $exe"
+} finally {
+  Remove-Item $temp -Recurse -Force -ErrorAction SilentlyContinue
+}
+{{- end }}

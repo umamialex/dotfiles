@@ -1,0 +1,83 @@
+{{- if eq .chezmoi.os "windows" -}}
+{{- $ids := regexSplit "\\s+" (includeTemplate "winget-ids" . | trim) -1 | compact -}}
+{{- $store := regexSplit "\\s+" (includeTemplate "winget-store-ids" . | trim) -1 | compact -}}
+$ErrorActionPreference = 'Stop'
+
+# Finds winget packages installed here that packages.yaml doesn't track, and asks what to do with
+# each: track it, uninstall it, or skip it. Without a terminal, and in CI, it only lists them.
+$tracked = @('{{ concat $ids $store .packages.winget_remove | join "','" }}') | Where-Object { $_ }
+$ignore = @('{{ .packages.audit_ignore.winget | join "','" }}') | Where-Object { $_ }
+$yaml = Join-Path '{{ .chezmoi.sourceDir }}' '.chezmoidata\packages.yaml'
+$skipFile = Join-Path $env:LOCALAPPDATA 'chezmoi-reconcile-skipped.txt'
+
+# the section names the prompt accepts, and the packages.yaml key each one writes to
+$sections = [ordered]@{
+  base = 'winget'
+  desktop = 'winget_desktop'
+  dev = 'winget_dev'
+  work = 'winget_work'
+  personal = 'winget_personal'
+  server = 'winget_server'
+  nvidia = 'winget_nvidia'
+  store = 'winget_store'
+}
+
+function Test-Ignored($id) {
+  foreach ($pattern in $ignore) { if ($id -like $pattern) { return $true } }
+  return $false
+}
+
+function Add-ToSection($section, $id) {
+  $lines = [System.Collections.Generic.List[string]]@(Get-Content $yaml)
+  $start = -1
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -eq "  ${section}:") { $start = $i; break }
+  }
+  if ($start -lt 0) { throw "section $section not found in $yaml" }
+  $end = $start
+  while ($end + 1 -lt $lines.Count -and $lines[$end + 1] -match '^    - ') { $end++ }
+  $lines.Insert($end + 1, "    - $id")
+  [IO.File]::WriteAllText($yaml, (($lines -join "`n") + "`n"))
+}
+
+# winget export lists everything from the winget source, including dependencies
+$export = Join-Path ([IO.Path]::GetTempPath()) "winget-reconcile-$PID.json"
+try {
+  winget export --output $export --source winget --accept-source-agreements | Out-Null
+  $installed = @((Get-Content $export -Raw | ConvertFrom-Json).Sources.Packages.PackageIdentifier | Sort-Object -Unique)
+} finally {
+  Remove-Item $export -Force -ErrorAction SilentlyContinue
+}
+
+$skipped = if (Test-Path $skipFile) { @(Get-Content $skipFile) } else { @() }
+$untracked = @($installed | Where-Object { $tracked -notcontains $_ -and $skipped -notcontains $_ -and -not (Test-Ignored $_) })
+if ($untracked.Count -eq 0) { return }
+
+$interactive = $env:CI -ne 'true' -and [Environment]::UserInteractive -and -not [Console]::IsInputRedirected
+if (-not $interactive) {
+  Write-Warning "winget packages not in packages.yaml: $($untracked -join ', ')"
+  return
+}
+
+foreach ($id in $untracked) {
+  $answer = Read-Host "$id is not tracked. [t]rack, [u]ninstall, [s]kip (blank asks again next time)"
+  switch -Regex ($answer) {
+    '^t' {
+      $choice = Read-Host "Section ($($sections.Keys -join ', '))"
+      if (-not $sections.Contains($choice)) { Write-Warning "unknown section '$choice', leaving $id for next time"; break }
+      Add-ToSection $sections[$choice] $id
+      Write-Host "Added $id to $($sections[$choice]) in $yaml, review and commit it"
+    }
+    '^u' {
+      $confirm = Read-Host "Uninstall $id? [y/N]"
+      if ($confirm -match '^y') {
+        winget uninstall --id $id --exact --silent --accept-source-agreements
+        if ($LASTEXITCODE -ne 0) { Write-Warning "winget uninstall failed for $id (exit code $LASTEXITCODE)" }
+      }
+    }
+    '^s' {
+      Add-Content -Path $skipFile -Value $id
+    }
+  }
+}
+{{- end }}

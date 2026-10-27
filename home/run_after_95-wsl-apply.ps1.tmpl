@@ -1,0 +1,26 @@
+{{- if and (eq .chezmoi.os "windows") (ne (env "CI") "true") -}}
+$ErrorActionPreference = 'Stop'
+
+# Applies the dotfiles inside WSL too, so one chezmoi apply in PowerShell updates both sides.
+# It skips when WSL, the Ubuntu distro, or chezmoi inside it isn't there yet, as on a new machine.
+if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) {
+  Write-Warning 'wsl.exe not found, skipping the WSL apply'
+  return
+}
+
+# wsl.exe writes UTF-16, so read its output as such
+$previous = [Console]::OutputEncoding
+[Console]::OutputEncoding = [System.Text.Encoding]::Unicode
+$distros = @(wsl.exe --list --quiet | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+[Console]::OutputEncoding = $previous
+
+if ($distros -notcontains 'Ubuntu') {
+  Write-Warning 'No Ubuntu distro in WSL yet, skipping the WSL apply'
+  return
+}
+
+wsl.exe -d Ubuntu -- bash -lc 'if command -v chezmoi > /dev/null; then chezmoi apply; else echo "chezmoi is not installed in WSL yet, skipping the WSL apply"; fi'
+if ($LASTEXITCODE -ne 0) {
+  Write-Warning "the WSL apply failed (exit code $LASTEXITCODE)"
+}
+{{- end }}

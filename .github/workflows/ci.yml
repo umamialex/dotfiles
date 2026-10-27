@@ -16,9 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CHEZMOI_VERSION: 2.73.3
-  CHEZMOI_LINUX_SHA256: 6e5827598cbfc02d132b04f95b5ea10efb5b79230e2a4a0e52df4af144a8ee9f
-  CHEZMOI_WINDOWS_SHA256: e74f9948a9ac6a5d8b0c0896a9ea129a766d92e38b50b70ee1fa1dc077755d6e
   ACTIONLINT_VERSION: 1.7.12
   ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
   TRUFFLEHOG_VERSION: 3.99.7
@@ -70,9 +67,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install chezmoi
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
-          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          # the latest release, checked against the checksums file published with it
+          version="$(gh release view --repo twpayne/chezmoi --json tagName --jq .tagName)"
+          base="https://github.com/twpayne/chezmoi/releases/download/${version}"
+          archive="chezmoi_${version#v}_linux_amd64.tar.gz"
+          curl -fsSL -o chezmoi.tar.gz "${base}/${archive}"
+          curl -fsSL -o checksums.txt "${base}/chezmoi_${version#v}_checksums.txt"
+          grep " ${archive}\$" checksums.txt | awk '{ print $1 "  chezmoi.tar.gz" }' | sha256sum -c -
           mkdir -p "$HOME/.local/bin"
           tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -88,15 +92,27 @@ jobs:
 
       - name: Render templates
         run: |
-          mkdir rendered
+          mkdir rendered rendered-laptop
           cd home
+          # gated scripts render empty without data, so render them with the flags turned on.
+          # CI is unset so the scripts that skip CI render too.
+          flags='"dev":true,"work":false,"server":true,"laptop":false,"gpu":"nvidia","nas_host":"nas.invalid"'
+          laptop_flags='"dev":true,"work":false,"server":true,"laptop":true,"gpu":"nvidia","nas_host":"nas.invalid"'
           for f in run_*.sh.tmpl; do
-            chezmoi --source "$GITHUB_WORKSPACE" execute-template < "$f" > "../rendered/${f%.tmpl}"
+            env -u CI chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{$flags}" < "$f" > "../rendered/${f%.tmpl}"
           done
           for f in run_*.ps1.tmpl; do
-            chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data '{"chezmoi":{"os":"windows"}}' < "$f" > "../rendered/${f%.tmpl}"
+            env -u CI chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{\"chezmoi\":{\"os\":\"windows\"},$flags}" < "$f" > "../rendered/${f%.tmpl}"
+            env -u CI chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{\"chezmoi\":{\"os\":\"windows\"},$laptop_flags}" < "$f" > "../rendered-laptop/${f%.tmpl}"
           done
           chezmoi --source "$GITHUB_WORKSPACE" execute-template < .chezmoiexternal.toml.tmpl > ../rendered/chezmoiexternal.toml
+
+      - name: Check the Windows Terminal seed is valid JSON
+        run: |
+          seed=home/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/create_settings.json.tmpl
+          for dev in true false; do
+            chezmoi --source "$GITHUB_WORKSPACE" execute-template --override-data "{\"dev\":$dev}" < "$seed" | python3 -m json.tool > /dev/null
+          done
 
       - name: Check shell scripts
         run: |
@@ -105,13 +121,21 @@ jobs:
             shellcheck "$f"
           done
 
+      - name: Check the trufflehog pins agree
+        run: |
+          pinned="$(chezmoi --source "$GITHUB_WORKSPACE" data --format json | jq -r .packages.trufflehog.version)"
+          if [ "$pinned" != "$TRUFFLEHOG_VERSION" ]; then
+            echo "packages.yaml pins trufflehog $pinned but ci.yml uses $TRUFFLEHOG_VERSION"
+            exit 1
+          fi
+
       - name: Check external config is valid TOML
         run: python3 -c "import tomllib; tomllib.load(open('rendered/chezmoiexternal.toml', 'rb'))"
 
       - name: Check PowerShell scripts
         shell: pwsh
         run: |
-          foreach ($file in Get-ChildItem rendered, scripts, home/dot_config/powershell -Filter *.ps1) {
+          foreach ($file in Get-ChildItem rendered, rendered-laptop, scripts, home/dot_config/powershell -Filter *.ps1) {
             $errors = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors)
             if ($errors.Count -gt 0) {
@@ -150,15 +174,22 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install chezmoi
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL -o chezmoi.tar.gz "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
-          echo "${CHEZMOI_LINUX_SHA256}  chezmoi.tar.gz" | sha256sum -c -
+          # the latest release, checked against the checksums file published with it
+          version="$(gh release view --repo twpayne/chezmoi --json tagName --jq .tagName)"
+          base="https://github.com/twpayne/chezmoi/releases/download/${version}"
+          archive="chezmoi_${version#v}_linux_amd64.tar.gz"
+          curl -fsSL -o chezmoi.tar.gz "${base}/${archive}"
+          curl -fsSL -o checksums.txt "${base}/chezmoi_${version#v}_checksums.txt"
+          grep " ${archive}\$" checksums.txt | awk '{ print $1 "  chezmoi.tar.gz" }' | sha256sum -c -
           mkdir -p "$HOME/.local/bin"
           tar -xzf chezmoi.tar.gz -C "$HOME/.local/bin" chezmoi
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Apply dotfiles
-        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
+        run: chezmoi init --apply --source "$GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com,NAS host=ci-nas.invalid" --promptBool "Dev machine=true,Home server=false,Work machine=false"
 
       - name: Smoke test
         run: |
@@ -168,12 +199,13 @@ jobs:
                      "ag --version" "htop --version" "mise --version" "node -v" "go version" \
                      "kubectl version --client" "helm version --short" "gh --version" "fzf --version" \
                      "fd --version" "bat --version" "eza --version" "zoxide --version" "fisher --version" \
+                     "terraform version" "tofu version" "k6 version" "jq --version" \
                      "type -q tide" "functions -q fzf_configure_bindings" "functions -q z"; do
             echo "+ $cmd"
             fish -ic "$cmd" < /dev/null > /dev/null
           done
           # GitHub's runners ship some of these tools, so check they come from mise
-          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff; do
+          for tool in node go kubectl helm gh trufflehog fzf fd bat eza zoxide ruff terraform tofu k6 jq; do
             fish -ic "type -p $tool" < /dev/null | grep -q mise || { echo "$tool does not come from mise"; exit 1; }
           done
           fish -ic 'functions ls | string match -q "*eza*"' < /dev/null
@@ -187,11 +219,25 @@ jobs:
           grep -q falcon "$vim_out"
           grep -q "'ruff'" "$vim_out"
           test -d "$HOME/.tmux/plugins/tmux-sensible"
+          # the pre-commit hook is wired up, and blocks a commit when trufflehog is missing
+          test -x "$HOME/.config/git/hooks/pre-commit"
+          # the tilde is meant literally: the config value is expanded by git, not the shell
+          # shellcheck disable=SC2088
+          test "$(git config --global core.hooksPath)" = "~/.config/git/hooks"
+          repo="$(mktemp -d)"
+          git -C "$repo" init -q
+          echo test > "$repo/file"
+          git -C "$repo" add file
+          if PATH=/usr/bin:/bin git -C "$repo" -c user.name=ci -c user.email=ci@example.com commit -q -m test; then
+            echo "the pre-commit hook should block a commit when trufflehog is missing"
+            exit 1
+          fi
 
       - name: Check idempotency
         run: |
           chezmoi --source "$GITHUB_WORKSPACE" apply --verbose
-          chezmoi --source "$GITHUB_WORKSPACE" verify
+          # scripts that run on every apply always count as pending, so only files are verified
+          chezmoi --source "$GITHUB_WORKSPACE" verify --exclude scripts
 
   windows:
     needs: changes
@@ -203,9 +249,18 @@ jobs:
 
       - name: Install chezmoi
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          Invoke-WebRequest -Uri "https://github.com/twpayne/chezmoi/releases/download/v$env:CHEZMOI_VERSION/chezmoi_${env:CHEZMOI_VERSION}_windows_amd64.zip" -OutFile chezmoi.zip
-          if ((Get-FileHash chezmoi.zip -Algorithm SHA256).Hash.ToLower() -ne $env:CHEZMOI_WINDOWS_SHA256) { throw 'chezmoi checksum mismatch' }
+          # the latest release, checked against the checksums file published with it
+          $version = gh release view --repo twpayne/chezmoi --json tagName --jq .tagName
+          $bare = $version.TrimStart('v')
+          $archive = "chezmoi_${bare}_windows_amd64.zip"
+          $base = "https://github.com/twpayne/chezmoi/releases/download/$version"
+          Invoke-WebRequest -Uri "$base/$archive" -OutFile chezmoi.zip
+          Invoke-WebRequest -Uri "$base/chezmoi_${bare}_checksums.txt" -OutFile checksums.txt
+          $expected = ((Select-String -Path checksums.txt -Pattern "$([regex]::Escape($archive))$").Line -split '\s+')[0]
+          if ((Get-FileHash chezmoi.zip -Algorithm SHA256).Hash.ToLower() -ne $expected) { throw 'chezmoi checksum mismatch' }
           Expand-Archive chezmoi.zip -DestinationPath "$env:RUNNER_TEMP\chezmoi"
           "$env:RUNNER_TEMP\chezmoi" | Out-File -FilePath $env:GITHUB_PATH -Append
 
@@ -220,22 +275,28 @@ jobs:
 
       - name: Apply dotfiles
         shell: pwsh
-        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com" --promptBool "Home server=false"
+        run: chezmoi init --apply --source "$env:GITHUB_WORKSPACE" --promptString "Name=CI,Email=ci@example.com,NAS host=ci-nas.invalid" --promptBool "Dev machine=true,Home server=false,Work machine=false"
 
       - name: Smoke test
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $packages = (chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).packages
-          foreach ($id in $packages.winget) {
+          # the expected set comes from the same template the install script uses
+          $expected = @('{{ includeTemplate "winget-ids" . }}' | chezmoi --source "$env:GITHUB_WORKSPACE" execute-template) | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+          if ($expected.Count -ne @($packages.winget).Count) { throw "CI should only install the base winget list, got: $($expected -join ', ')" }
+          foreach ($id in $expected) {
             winget list --id $id --exact --source winget | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "$id is not installed" }
           }
-          # drivers, services and server-only apps must be skipped in CI
-          foreach ($id in @($packages.winget_desktop) + @($packages.winget_server)) {
+          # drivers, services, and the dev, work, personal, server and GPU apps must be skipped in CI
+          $skipped = @($packages.winget_desktop) + @($packages.winget_server) + @($packages.winget_dev) + @($packages.winget_work) + @($packages.winget_personal) + @($packages.winget_nvidia)
+          foreach ($id in $skipped) {
             winget list --id $id --exact --source winget | Out-Null
             if ($LASTEXITCODE -eq 0) { throw "$id should not be installed in CI" }
           }
+          # the audit must run, and may report packages the runner image ships
+          & "$env:GITHUB_WORKSPACE\scripts\audit-packages.ps1"
           if (-not (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\SourceCodePro-Regular.ttf")) { throw 'Source Code Pro not installed' }
           if ((Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR').AppCaptureEnabled -ne 0) { throw 'Game Bar capture still enabled' }
           if ((Get-ItemProperty 'HKCU:\System\GameConfigStore').GameDVR_Enabled -ne 0) { throw 'GameDVR still enabled' }
@@ -272,9 +333,11 @@ jobs:
           & $vim -es -N -u (Join-Path $HOME '_vimrc') -c "redir! > $vimOut" -c 'echo get(g:, "colors_name", "NONE")' -c 'echo string(map(ale#linter#Get("python"), "v:val.name"))' -c 'redir END' -c 'qa!'
           $vimResult = Get-Content $vimOut -Raw
           if ($vimResult -notmatch 'falcon' -or $vimResult -notmatch 'ruff') { throw "vim config did not load: $vimResult" }
-          foreach ($path in 'Scripts\Set-ChromeBorder.ps1', 'Scripts\AutoHotkey\multimedia-control.ahk') {
-            if (-not (Test-Path (Join-Path $HOME $path))) { throw "$path not applied" }
-          }
+          if (-not (Test-Path (Join-Path $HOME 'Scripts\Set-ChromeBorder.ps1'))) { throw 'Scripts\Set-ChromeBorder.ps1 not applied' }
+          # the AutoHotkey script is only for the home server
+          $isServer = [bool](chezmoi --source "$env:GITHUB_WORKSPACE" data --format json | ConvertFrom-Json).server
+          $ahkApplied = Test-Path (Join-Path $HOME 'Scripts\AutoHotkey\multimedia-control.ahk')
+          if ($ahkApplied -ne $isServer) { throw "AutoHotkey script applied is $ahkApplied but server is $isServer" }
           if (Select-String -Path (Join-Path $HOME '.tmux.conf') -Pattern 'tpm' -Quiet) { throw 'tpm should not be in the Windows tmux config' }
           # winget changes PATH after this job started, so reload it like a new terminal would
           $env:PATH = [Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('PATH', 'User')
@@ -289,9 +352,22 @@ jobs:
           # a fresh pwsh loads the real profile through the stub
           $loaded = pwsh -NoLogo -Command '(Get-Command ls).CommandType; (Get-Command dev).CommandType; [bool](Get-Command z); [bool](Get-Command prompt)'
           if (($loaded -join ' ') -ne 'Function Function True True') { throw "profile did not load: $($loaded -join ' ')" }
+          # the pinned trufflehog is installed, and the pre-commit hook runs under Git for Windows
+          $trufflehog = Join-Path $HOME '.local\bin\trufflehog.exe'
+          # chezmoi is no longer on PATH after the reload above, so use the data read at the top of this step
+          $pinned = $packages.trufflehog.version
+          if ((& $trufflehog --version 2>&1 | Out-String) -notmatch [regex]::Escape($pinned)) { throw "trufflehog $pinned is not installed" }
+          if (-not (Test-Path (Join-Path $HOME '.config\git\hooks\pre-commit'))) { throw 'pre-commit hook not applied' }
+          $repo = Join-Path $env:RUNNER_TEMP 'hook-test'
+          git init -q $repo
+          'test' | Set-Content (Join-Path $repo 'file')
+          git -C $repo add file
+          git -C $repo -c user.name=ci -c user.email=ci@example.com commit -q -m test
+          if ($LASTEXITCODE -ne 0) { throw 'the pre-commit hook blocked a harmless commit' }
 
       - name: Check idempotency
         shell: pwsh
         run: |
           chezmoi --source "$env:GITHUB_WORKSPACE" apply --verbose
-          chezmoi --source "$env:GITHUB_WORKSPACE" verify
+          # scripts that run on every apply always count as pending, so only files are verified
+          chezmoi --source "$env:GITHUB_WORKSPACE" verify --exclude scripts

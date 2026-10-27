@@ -1,11 +1,44 @@
 {{- $name := promptStringOnce . "name" "Name" "Alex Martin" -}}
 {{- $email := promptStringOnce . "email" "Email" "alex@umamialex.com" -}}
+{{- $dev := promptBoolOnce . "dev" "Dev machine" true -}}
 {{- $server := promptBoolOnce . "server" "Home server" false -}}
+{{- $work := promptBoolOnce . "work" "Work machine" false -}}
+{{- $nasHost := "" -}}
+{{- if not $work -}}
+{{-   $nasHost = promptStringOnce . "nas_host" "NAS host" "" -}}
+{{- end -}}
+{{- /* detected once at init, rerun chezmoi init after changing hardware */ -}}
+{{- $laptop := false -}}
+{{- $cpu := "" -}}
+{{- $gpu := "" -}}
+{{- if eq .chezmoi.os "windows" -}}
+{{-   $laptop = eq (output "powershell.exe" "-NoProfile" "-NonInteractive" "-Command" "[bool](Get-CimInstance Win32_Battery)" | trim) "True" -}}
+{{-   $cpuName := output "powershell.exe" "-NoProfile" "-NonInteractive" "-Command" "(Get-CimInstance Win32_Processor | Select-Object -First 1).Manufacturer" | trim | lower -}}
+{{-   if contains "amd" $cpuName -}}
+{{-     $cpu = "amd" -}}
+{{-   else if contains "intel" $cpuName -}}
+{{-     $cpu = "intel" -}}
+{{-   end -}}
+{{-   $gpuNames := output "powershell.exe" "-NoProfile" "-NonInteractive" "-Command" "(Get-CimInstance Win32_VideoController).Name -join ';'" | trim | lower -}}
+{{-   if contains "nvidia" $gpuNames -}}
+{{-     $gpu = "nvidia" -}}
+{{-   else if or (contains "amd" $gpuNames) (contains "radeon" $gpuNames) -}}
+{{-     $gpu = "amd" -}}
+{{-   else if contains "intel" $gpuNames -}}
+{{-     $gpu = "intel" -}}
+{{-   end -}}
+{{- end -}}
 
 [data]
   name = {{ $name | quote }}
   email = {{ $email | quote }}
+  dev = {{ $dev }}
   server = {{ $server }}
+  work = {{ $work }}
+  laptop = {{ $laptop }}
+  cpu = {{ $cpu | quote }}
+  gpu = {{ $gpu | quote }}
+  nas_host = {{ $nasHost | quote }}
 {{- if eq .chezmoi.os "windows" }}
 
 [interpreters.ps1]

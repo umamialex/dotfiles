@@ -1,13 +1,6 @@
 {{- if eq .chezmoi.os "windows" -}}
-{{- $ids := .packages.winget -}}
-{{- $store := list -}}
-{{- if ne (env "CI") "true" -}}
-{{-   $ids = concat $ids .packages.winget_desktop -}}
-{{-   $store = .packages.winget_store -}}
-{{-   if and (hasKey . "server") .server -}}
-{{-     $ids = concat $ids .packages.winget_server -}}
-{{-   end -}}
-{{- end -}}
+{{- $ids := regexSplit "\\s+" (includeTemplate "winget-ids" . | trim) -1 | compact -}}
+{{- $store := regexSplit "\\s+" (includeTemplate "winget-store-ids" . | trim) -1 | compact -}}
 # winget packages hash: {{ concat $ids $store | toJson | sha256sum }}
 $ErrorActionPreference = 'Stop'
 

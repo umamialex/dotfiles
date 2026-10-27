@@ -1,0 +1,21 @@
+{{- /* global mise tools. Shared by ~/.config/mise/config.toml and the script that installs them, so the install reruns when the tools change. */ -}}
+{{- $dev := and (hasKey . "dev") .dev -}}
+[tools]
+node = "lts"
+go = "latest"
+kubectl = "latest"
+helm = "latest"
+gh = "latest"
+trufflehog = "latest"
+fzf = "latest"
+fd = "latest"
+bat = "latest"
+eza = "latest"
+zoxide = "latest"
+ruff = "latest"
+{{- if $dev }}
+terraform = "latest"
+opentofu = "latest"
+k6 = "latest"
+jq = "latest"
+{{- end }}

@@ -1,0 +1,30 @@
+{{- /* winget package ids for this machine, one per line. Shared by the install, upgrade and reconcile scripts. */ -}}
+{{- $dev := and (hasKey . "dev") .dev -}}
+{{- $work := and (hasKey . "work") .work -}}
+{{- $server := and (hasKey . "server") .server -}}
+{{- $gpu := "" -}}
+{{- if hasKey . "gpu" -}}
+{{-   $gpu = .gpu -}}
+{{- end -}}
+{{- $ids := .packages.winget -}}
+{{- if ne (env "CI") "true" -}}
+{{-   $ids = concat $ids .packages.winget_desktop -}}
+{{-   if $server -}}
+{{-     $ids = concat $ids .packages.winget_server -}}
+{{-   end -}}
+{{-   if $dev -}}
+{{-     $ids = concat $ids .packages.winget_dev -}}
+{{-   end -}}
+{{-   if $work -}}
+{{-     $ids = concat $ids .packages.winget_work -}}
+{{-   end -}}
+{{-   if and (not $work) (not $server) -}}
+{{-     $ids = concat $ids .packages.winget_personal -}}
+{{-   end -}}
+{{-   if eq $gpu "nvidia" -}}
+{{-     $ids = concat $ids .packages.winget_nvidia -}}
+{{-   end -}}
+{{- end -}}
+{{- range $ids }}
+{{ . }}
+{{- end }}

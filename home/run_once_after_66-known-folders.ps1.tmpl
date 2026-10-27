@@ -1,0 +1,60 @@
+{{- $work := and (hasKey . "work") .work -}}
+{{- if and (eq .chezmoi.os "windows") (not $work) -}}
+$ErrorActionPreference = 'Stop'
+
+# Moves Desktop, Documents and Pictures out of OneDrive. Files are copied first and never deleted,
+# so the OneDrive folders stay as a backup, and the old values are saved so the change can be undone.
+$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders'
+$targets = [ordered]@{
+  'Desktop' = 'Desktop'
+  'Personal' = 'Documents'
+  'My Pictures' = 'Pictures'
+  '{F42EE2D3-909F-4907-8871-4C22FC0BF756}' = 'Documents'
+  '{0DDD015D-B06C-45D5-8C4C-F59713854639}' = 'Pictures'
+}
+
+$current = Get-ItemProperty $key
+$moves = @()
+foreach ($name in $targets.Keys) {
+  $value = $current.$name
+  if ($value -and $value -match 'OneDrive') {
+    $moves += [pscustomobject]@{
+      Name = $name
+      From = [Environment]::ExpandEnvironmentVariables($value)
+      To = Join-Path $HOME $targets[$name]
+    }
+  }
+}
+if ($moves.Count -eq 0) {
+  Write-Host 'No known folders are redirected into OneDrive'
+  return
+}
+
+$before = [ordered]@{}
+foreach ($move in $moves) { $before[$move.Name] = $current.($move.Name) }
+$backup = Join-Path $env:LOCALAPPDATA ("Temp\known-folders-before-{0}.json" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
+$before | ConvertTo-Json | Set-Content -Path $backup -Encoding UTF8
+Write-Host "Saved the old known folder values to $backup"
+
+# copy and verify every folder before changing any registry value
+foreach ($pair in ($moves | Sort-Object From, To -Unique)) {
+  if (-not (Test-Path $pair.From)) { continue }
+  New-Item -ItemType Directory -Path $pair.To -Force | Out-Null
+  robocopy $pair.From $pair.To /E /COPY:DAT /DCOPY:DAT /XO /R:1 /W:1 /NP /NFL /NDL /NJH /NJS | Out-Null
+  # robocopy exit codes of 8 and above mean a failure
+  if ($LASTEXITCODE -ge 8) { throw "robocopy failed for $($pair.From) (exit code $LASTEXITCODE)" }
+
+  $missing = @()
+  foreach ($file in Get-ChildItem $pair.From -Recurse -Force -File -ErrorAction SilentlyContinue) {
+    $dest = Join-Path $pair.To $file.FullName.Substring($pair.From.Length)
+    if (-not (Test-Path -LiteralPath $dest) -or (Get-Item -LiteralPath $dest -Force).Length -ne $file.Length) { $missing += $dest }
+  }
+  if ($missing.Count -gt 0) { throw "$($missing.Count) files from $($pair.From) were not copied, leaving the folders where they are" }
+  Write-Host "Copied $($pair.From) to $($pair.To)"
+}
+
+foreach ($move in $moves) {
+  Set-ItemProperty -Path $key -Name $move.Name -Value $move.To -Type ExpandString
+}
+Write-Host 'Known folders repointed. Sign out and back in for apps to pick them up. The OneDrive copies were left in place.'
+{{- end }}

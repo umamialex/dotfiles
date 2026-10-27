@@ -1,4 +1,5 @@
-{{- if eq .chezmoi.os "windows" -}}
+{{- $work := and (hasKey . "work") .work -}}
+{{- if and (eq .chezmoi.os "windows") (not $work) -}}
 #Requires -RunAsAdministrator
 $ErrorActionPreference = 'Stop'
 

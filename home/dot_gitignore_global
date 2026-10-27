@@ -9,3 +9,5 @@ tmux*.log
 
 yarn-error.log
 newrelic_agent.log
+
+**/.claude/settings.local.json

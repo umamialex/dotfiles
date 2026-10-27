@@ -1,0 +1,72 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+set -euo pipefail
+
+# Finds apt packages installed by hand that packages.yaml doesn't track, and asks what to do with
+# each: track it, uninstall it, or skip it. Without a terminal, and in CI, it only lists them.
+# Only optional and extra priority packages count, which leaves out the Ubuntu base system.
+yaml='{{ .chezmoi.sourceDir }}/.chezmoidata/packages.yaml'
+skip_file="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi-reconcile-apt-skipped"
+tracked=' {{ .packages.apt | join " " }} '
+
+is_ignored() {
+  case "$1" in
+{{- range .packages.audit_ignore.apt }}
+    {{ . }}) return 0 ;;
+{{- end }}
+  esac
+  return 1
+}
+
+untracked=()
+# shellcheck disable=SC2016 # dpkg-query expands its own format fields
+while read -r package; do
+  case "$tracked" in *" $package "*) continue ;; esac
+  if is_ignored "$package"; then continue; fi
+  if [ -f "$skip_file" ] && grep -qxF "$package" "$skip_file"; then continue; fi
+  untracked+=("$package")
+done < <(apt-mark showmanual | xargs dpkg-query -W -f='${Package} ${Priority}\n' 2> /dev/null | awk '$2 == "optional" || $2 == "extra" { print $1 }' | sort -u)
+
+if [ "${#untracked[@]}" -eq 0 ]; then
+  exit 0
+fi
+
+if [ -n "${CI:-}" ] || [ ! -t 0 ]; then
+  echo "apt packages not in packages.yaml: ${untracked[*]}" >&2
+  exit 0
+fi
+
+add_to_apt() {
+  local tmp
+  tmp="$(mktemp)"
+  awk -v item="    - $1" '
+    /^  apt:$/ { in_list = 1; print; next }
+    in_list && /^    - / { print; next }
+    in_list { print item; in_list = 0 }
+    { print }
+    END { if (in_list) print item }
+  ' "$yaml" > "$tmp"
+  cat "$tmp" > "$yaml"
+  rm -f "$tmp"
+}
+
+for package in "${untracked[@]}"; do
+  read -r -p "$package is not tracked. [t]rack, [u]ninstall, [s]kip (blank asks again next time) " answer
+  case "$answer" in
+    t*)
+      add_to_apt "$package"
+      echo "Added $package to apt in $yaml, review and commit it"
+      ;;
+    u*)
+      read -r -p "Uninstall $package? [y/N] " confirm
+      if [[ $confirm == [yY]* ]]; then
+        sudo apt-get remove -y "$package"
+      fi
+      ;;
+    s*)
+      mkdir -p "$(dirname "$skip_file")"
+      echo "$package" >> "$skip_file"
+      ;;
+  esac
+done
+{{- end }}

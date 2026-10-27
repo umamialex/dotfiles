@@ -1,9 +1,11 @@
-{{- if eq .chezmoi.os "windows" -}}
+{{- $work := and (hasKey . "work") .work -}}
+{{- if and (eq .chezmoi.os "windows") (not $work) -}}
 #Requires -RunAsAdministrator
 # startup list hash: {{ .packages.startup_disable | toJson | sha256sum }}
 $ErrorActionPreference = 'Stop'
 
 $runEntries = @('{{ .packages.startup_disable.run | join "','" }}')
+$machineEntries = @('{{ .packages.startup_disable.run_machine | join "','" }}')
 $folderEntries = @('{{ .packages.startup_disable.startup_folder | join "','" }}')
 
 $explorer = 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved'
@@ -17,13 +19,20 @@ function Disable-StartupEntry($key, $name) {
 }
 
 # Only touches entries that exist on this machine, so a missing app is not an error.
-$runKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
-$present = if (Test-Path $runKey) { (Get-Item $runKey).Property } else { @() }
-foreach ($pattern in $runEntries) {
-  foreach ($name in @($present | Where-Object { $_ -like $pattern })) {
-    Disable-StartupEntry "HKCU:\$explorer\Run" $name
+function Disable-RunEntries($runKey, $approvedKey, $patterns) {
+  $present = if (Test-Path $runKey) { (Get-Item $runKey).Property } else { @() }
+  foreach ($pattern in $patterns) {
+    foreach ($name in @($present | Where-Object { $_ -like $pattern })) {
+      Disable-StartupEntry $approvedKey $name
+    }
   }
 }
+
+Disable-RunEntries 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' "HKCU:\$explorer\Run" $runEntries
+
+# HKLM Run has a 64-bit and a 32-bit key, and each has its own StartupApproved key
+Disable-RunEntries 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run' "HKLM:\$explorer\Run" $machineEntries
+Disable-RunEntries 'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run' "HKLM:\$explorer\Run32" $machineEntries
 
 $folders = @(
   @{ Path = Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs\StartUp'; Key = "HKLM:\$explorer\StartupFolder" },

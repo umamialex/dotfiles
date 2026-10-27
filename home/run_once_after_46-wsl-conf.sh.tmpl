@@ -1,0 +1,25 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+set -euo pipefail
+
+# Turns on systemd in WSL. Only WSL reads /etc/wsl.conf.
+if ! grep -qi microsoft /proc/version; then
+  exit 0
+fi
+
+conf=/etc/wsl.conf
+if grep -qs '^systemd=true' "$conf"; then
+  exit 0
+fi
+
+# drop a systemd=false line, so the file doesn't end up with the key twice
+if [ -f "$conf" ]; then
+  sudo sed -i '/^systemd[[:space:]]*=/d' "$conf"
+fi
+if grep -qs '^\[boot\]' "$conf"; then
+  sudo sed -i '/^\[boot\]/a systemd=true' "$conf"
+else
+  printf '[boot]\nsystemd=true\n' | sudo tee -a "$conf" > /dev/null
+fi
+echo "Enabled systemd in $conf, run wsl --shutdown from Windows to apply it"
+{{- end }}
