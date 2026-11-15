@@ -35,6 +35,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
         * Home server: server-only apps and the AutoHotkey media keys
         * Work machine: skips OneDrive, debloat, startup disabling and personal apps, and installs the work apps
         * NAS host, not asked on work machines: the NAS that `G:` maps to
+        * SSH public key, only asked on the home server: the key allowed to log in over SSH (blank skips it)
     * `chezmoi init` also detects a laptop (a battery) and the CPU and GPU vendor. Run it again after changing hardware
     * Installs apps with winget from `home/.chezmoidata/packages.yaml`
         * `winget`: every machine
@@ -61,6 +62,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
       history suggestions, `eza` for `ls`, `zoxide`, fzf key bindings (PSFzf), a starship prompt, and the `dev`, `p`, `g` shortcuts
     * Disables Multiplane Overlay (fixes Chrome freezing with several video streams, needs a restart)
     * Keeps Chrome windows on black, square borders with a logon task (`~/Scripts/Set-ChromeBorder.ps1`)
+    * On the home server, installs the OpenSSH server, starts it at boot, opens port 22, makes Windows PowerShell the SSH shell and authorizes the SSH public key. The first run needs a restart after the install, then run `chezmoi apply` again. Disable password logins in `sshd_config` yourself once key login works
     * Installs AutoHotkey v2, and on the home server starts `~/Scripts/AutoHotkey/multimedia-control.ahk` at sign-in
     * Disables the startup entries listed in `packages.startup_disable` that exist on the machine, except on work machines
     * Installs WSL 2, Ubuntu, and the `Source Code Pro` font
