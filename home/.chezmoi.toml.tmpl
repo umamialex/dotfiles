@@ -7,6 +7,10 @@
 {{- if not $work -}}
 {{-   $nasHost = promptStringOnce . "nas_host" "NAS host" "" -}}
 {{- end -}}
+{{- $sshKey := "" -}}
+{{- if $server -}}
+{{-   $sshKey = promptStringOnce . "ssh_public_key" "SSH public key allowed to log in (blank to skip)" "" -}}
+{{- end -}}
 {{- /* detected once at init, rerun chezmoi init after changing hardware */ -}}
 {{- $laptop := false -}}
 {{- $cpu := "" -}}
@@ -39,6 +43,7 @@
   cpu = {{ $cpu | quote }}
   gpu = {{ $gpu | quote }}
   nas_host = {{ $nasHost | quote }}
+  ssh_public_key = {{ $sshKey | quote }}
 {{- if eq .chezmoi.os "windows" }}
 
 [interpreters.ps1]
