@@ -65,6 +65,7 @@ packages:
     - Anthropic.Claude
     - ArduinoSA.IDE.stable
     - Docker.DockerDesktop
+    - OpenJS.NodeJS.LTS
   # only on work machines (answer "yes" to the Work machine prompt), skipped in CI
   winget_work:
     - Zoom.Zoom
