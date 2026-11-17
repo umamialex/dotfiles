@@ -4,4 +4,10 @@
 set -euo pipefail
 
 "$HOME/.local/bin/mise" install --yes
+
+# The pre-commit hook runs in non-interactive shells, where only fish has activated mise,
+# so put trufflehog on the PATH through the mise shim.
+mkdir -p "$HOME/.local/bin"
+"$HOME/.local/bin/mise" reshim
+ln -sfn "$HOME/.local/share/mise/shims/trufflehog" "$HOME/.local/bin/trufflehog"
 {{- end }}
