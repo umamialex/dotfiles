@@ -30,7 +30,7 @@ My personal dotfiles, managed with [chezmoi](https://www.chezmoi.io) and [mise](
     > chezmoi init --apply umamialex
     ```
     * `chezmoi init` asks these questions and remembers the answers
-        * Name and email
+        * Name and email: the email defaults to alex.martin@grafana.com on work machines and alex@umamialex.com otherwise
         * Dev machine: dev tools, and Ubuntu as the Windows Terminal default
         * Home server: server-only apps and the AutoHotkey media keys
         * Work machine: skips OneDrive, debloat, startup disabling and personal apps, and installs the work apps
@@ -98,6 +98,7 @@ Vim itself comes from apt, so it is Ubuntu's version (9.1); Windows gets the new
 * Asks about apt packages that `packages.yaml` doesn't track, the same way as winget
 * Turns on systemd in `/etc/wsl.conf`, which needs `wsl --shutdown` from Windows to take effect
 * Mounts the NAS at `/mnt/gdrive` when Windows doesn't map `G:`, except on work machines
+* Sets git to use `gh auth git-credential` for HTTPS remotes on github.com, on Linux and Windows. Run `gh auth login` once so it has a token
 * Runs trufflehog on the staged changes before every commit, in every repo. Skip it for one commit with `git commit --no-verify`
 
 ## Day to day
