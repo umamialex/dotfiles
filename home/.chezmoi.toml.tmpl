@@ -1,8 +1,12 @@
 {{- $name := promptStringOnce . "name" "Name" "Alex Martin" -}}
-{{- $email := promptStringOnce . "email" "Email" "alex@umamialex.com" -}}
+{{- $work := promptBoolOnce . "work" "Work machine" false -}}
+{{- $emailDefault := "alex@umamialex.com" -}}
+{{- if $work -}}
+{{-   $emailDefault = "alex.martin@grafana.com" -}}
+{{- end -}}
+{{- $email := promptStringOnce . "email" "Email" $emailDefault -}}
 {{- $dev := promptBoolOnce . "dev" "Dev machine" true -}}
 {{- $server := promptBoolOnce . "server" "Home server" false -}}
-{{- $work := promptBoolOnce . "work" "Work machine" false -}}
 {{- $nasHost := "" -}}
 {{- if not $work -}}
 {{-   $nasHost = promptStringOnce . "nas_host" "NAS host" "" -}}
